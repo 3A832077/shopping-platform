@@ -1,0 +1,22 @@
+[nz-carousel-content] {
+  text-align: center;
+  height: 160px;
+  line-height: 160px;
+  background: #364d79;
+  color: #fff;
+  overflow: hidden;
+}
+
+h3 {
+  color: #fff;
+  margin-bottom: 0;
+  user-select: none;
+}
+
+.banner-carousel {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 24px auto;
+  border-radius: 12px;
+  overflow: hidden;
+}
