@@ -1,24 +1,26 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-form">
-      <h2 class="login-title">會員登入</h2>
+<div class="login-wrapper">
+  <div class="login-container">
+    <div class="image-section">
+      <img src="/img/loginbg.png" alt="Login Illustration" />
+    </div>
+    <div class="form-section">
+      <h2>登入</h2>
       <form [formGroup]="form">
         <nz-form-item>
           <nz-form-control>
-            <input nz-input formControlName="email" placeholder="Username" />
+            <input nz-input formControlName="email" placeholder="請輸入電子郵件" />
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-control>
-            <input nz-input type="password" formControlName="password" placeholder="Password" />
+            <input nz-input type="password" formControlName="password" placeholder="請輸入密碼" />
           </nz-form-control>
         </nz-form-item>
-        <a class="forgot-link" href="#">Forgot Password?</a>
-        <button nz-button nzType="primary" class="login-btn" [disabled]="form.invalid">Submit</button>
+        <a class="forgot">忘記密碼?</a>
+        <div>
+          <button nz-button nzType="primary" style="width: 100%;">登入</button>
+        </div>
       </form>
-    </div>
-    <div class="login-illustration">
-      <img src="assets/login-illustration.png" alt="illustration" />
     </div>
   </div>
 </div>
