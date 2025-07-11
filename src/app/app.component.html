@@ -1,1 +1,25 @@
-<router-outlet></router-outlet>
+<nz-layout>
+  <nz-header nzTheme="light">
+    <div class="logo">
+      <img src="/img/icon.png" alt="Logo" width="85px" height="60px"/>
+    </div>
+    <ul nz-menu nzTheme="light" nzMode="horizontal">
+      <li nz-menu-item>
+        <a nz-dropdown [nzDropdownMenu]="menu">分類</a>
+      </li>
+      <li nz-menu-item>購物車</li>
+      <li nz-menu-item>訂單紀錄</li>
+    </ul>
+    <nz-dropdown-menu #menu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item *ngFor="let item of categoryList">{{ item.name }}</li>
+      </ul>
+    </nz-dropdown-menu>
+  </nz-header>
+  <nz-content>
+    <div class="inner-content">
+      <router-outlet></router-outlet>
+    </div>
+  </nz-content>
+  <nz-footer>©2025</nz-footer>
+</nz-layout>

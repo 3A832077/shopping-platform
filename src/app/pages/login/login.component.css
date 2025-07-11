@@ -59,3 +59,10 @@
     color: #4a7cff;
     font-size: 14px;
   }
+
+.actionDiv{
+  display: flex;
+  justify-content: space-between;
+}
+
+

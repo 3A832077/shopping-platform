@@ -16,9 +16,16 @@
             <input nz-input type="password" formControlName="password" placeholder="請輸入密碼" />
           </nz-form-control>
         </nz-form-item>
-        <a class="forgot">忘記密碼?</a>
-        <div>
-          <button nz-button nzType="primary" style="width: 100%;">登入</button>
+        <div class="actionDiv">
+          <a>忘記密碼?</a>
+          <a>註冊</a>
+        </div>
+        <div style="gap: 10px;display: flex;">
+          <button nz-button nzType="primary" (click)="login()">登入</button>
+          <button nz-button nzType="default" (click)="supabaseService.googleLogin()">
+            <nz-icon nzType="google" nzTheme="outline" />
+            <span>Google</span>
+          </button>
         </div>
       </form>
     </div>
