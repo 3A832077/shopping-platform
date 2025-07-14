@@ -24,23 +24,34 @@ export class AppComponent implements OnInit {
 
   categoryList: any[] = [];
 
+  userId: string | null = null;
+
+  email: string | null = null;
+
   constructor(
                 private supabaseService: SupabaseService
-             ){}
+             ){
+                this.supabaseService.userId$.subscribe(userId => {
+                  this.userId = userId;
+                });
+                this.supabaseService.email$.subscribe(email => {
+                  this.email = email;
+                });
+             }
 
   ngOnInit(){
-    this.getCategories();
+
   }
 
-  getCategories() {
-    this.supabaseService?.getCategories()?.then(({ data, error }) => {
-      if (error) {
-        console.error('取得產品類別失敗', error);
-        return;
-      }
-      this.categoryList = data || [];
+  /**
+   * 登出
+   */
+  logout() {
+    this.supabaseService?.logout()?.then(() => {
+      this.userId = null;
+      this.email = null;
+      window.location.href = '/login';
     });
   }
-
 
 }

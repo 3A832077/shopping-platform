@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -9,6 +9,8 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { SupabaseService } from '../../service/supabase.service';
 import { checkPassword } from '../../validator/checkPassword';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalService, NzModalModule, NzModalRef } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +25,8 @@ import { checkPassword } from '../../validator/checkPassword';
     FormsModule,
     ReactiveFormsModule,
     NzLayoutModule,
-    NzIconModule
+    NzIconModule,
+    NzModalModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
@@ -32,30 +35,106 @@ export class LoginComponent implements OnInit {
 
   form: FormGroup = new FormGroup({});
 
+  isRegister = false;
+
+  email: string = '';
+
+  modal: NzModalRef | null = null;
+
   constructor(
-               private fb: FormBuilder,
-               public supabaseService: SupabaseService,
+                private fb: FormBuilder,
+                public supabaseService: SupabaseService,
+                private message: NzMessageService,
+                private modalService: NzModalService,
              ) { }
 
   ngOnInit() {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6), checkPassword]],
+      password: ['', [Validators.required, checkPassword]],
     });
   }
 
+  /**
+   * 登入
+   */
   async login() {
     if (this.form.valid) {
       const { email, password } = this.form.value;
       const result = await this.supabaseService.login(email, password);
       if (result?.error) {
-        console.error(result.error.message);
+        console.error(result.error);
       }
       else {
         window.location.href = '/home';
       }
     }
   }
+
+  /**
+   * 切換登入/註冊模式
+   */
+  toggleMode() {
+    this.isRegister = !this.isRegister;
+  }
+
+  /**
+   * 註冊
+   */
+  async register() {
+    if (this.form.valid) {
+      const { email, password} = this.form.value;
+      const result = await this.supabaseService.register(email, password);
+      if (result?.error) {
+        console.error(result.error);
+      }
+      else {
+        window.location.href = '/login';
+      }
+    }
+  }
+
+  /**
+   * 忘記密碼
+   */
+  openModal(tplContent: TemplateRef<{}>) {
+    const modal = this.modalService.create({
+      nzTitle: '忘記密碼',
+      nzContent: tplContent,
+      nzMaskClosable: false,
+      nzClosable: false,
+      nzCentered: true,
+      nzFooter: null,
+      nzZIndex: 60,
+    });
+  }
+
+  /**
+   * 關閉modal
+   */
+  close(){
+    this.modalService.closeAll();
+  }
+
+  /**
+   * 發送重設密碼郵件
+   */
+  async sendResetEmail() {
+    if (this.email) {
+      const result = await this.supabaseService.forgetPassword(this.email);
+      if (result?.error) {
+        this.message.error(result.error.message);
+      }
+      else {
+        this.message.success('重置密碼郵件已發送到您的電子郵件地址');
+        this.close();
+      }
+    }
+    else {
+      this.message.error('請輸入您的電子郵件地址');
+    }
+  }
+
 }
 
 

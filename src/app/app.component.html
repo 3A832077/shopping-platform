@@ -1,20 +1,22 @@
 <nz-layout>
   <nz-header nzTheme="light">
     <div class="logo">
-      <img src="/img/icon.png" alt="Logo" width="85px" height="60px"/>
+      <a routerLink="/home">
+        <img src="/img/icon.png" alt="Logo" width="85px" height="60px"/>
+      </a>
     </div>
-    <ul nz-menu nzTheme="light" nzMode="horizontal">
-      <li nz-menu-item>
-        <a nz-dropdown [nzDropdownMenu]="menu">分類</a>
-      </li>
-      <li nz-menu-item>購物車</li>
-      <li nz-menu-item>訂單紀錄</li>
+    <ul nz-menu nzTheme="light" nzMode="horizontal" class="menu-bar">
+      <div class="menu-right">
+        <li nz-menu-item>購物車</li>
+        <li nz-menu-item>訂單紀錄</li>
+        @if (userId && email) {
+          <li nz-menu-item (click)="logout()">登出</li>
+        }
+        @else {
+          <li nz-menu-item routerLink="/login">登入</li>
+        }
+      </div>
     </ul>
-    <nz-dropdown-menu #menu="nzDropdownMenu">
-      <ul nz-menu>
-        <li nz-menu-item *ngFor="let item of categoryList">{{ item.name }}</li>
-      </ul>
-    </nz-dropdown-menu>
   </nz-header>
   <nz-content>
     <div class="inner-content">

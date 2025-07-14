@@ -42,3 +42,13 @@ nz-header {
   top: 0;
   background: #fff;
 }
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+}
+
+.menu-right {
+  margin-left: auto;
+  display: flex;
+}

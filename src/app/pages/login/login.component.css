@@ -63,6 +63,17 @@
 .actionDiv{
   display: flex;
   justify-content: space-between;
+  padding-bottom: 10px;
 }
 
+.buttonDiv {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.error{
+  color: red;
+  padding-top: 5px;
+}
 

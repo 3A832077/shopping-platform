@@ -6,12 +6,16 @@ export function checkPassword(control: AbstractControl): { [key: string]: any } 
   const hasUpperCase = /[A-Z]/.test(value);
   const hasLowerCase = /[a-z]/.test(value);
   const hasNumber = /\d/.test(value);
+  const hasMinLength = value.length >= 8;
 
-  if (hasUpperCase && hasLowerCase && hasNumber) {
+  if (hasUpperCase && hasLowerCase && hasNumber && hasMinLength) {
+    return null;
+  }
+  else if (value === '') {
     return null;
   }
   return {
-    passwordComplexity: true
+    passwordError: true
   };
 
 }
