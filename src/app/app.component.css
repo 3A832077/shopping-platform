@@ -16,13 +16,14 @@
 }
 
 nz-content {
-  margin: 24px;
+  /* margin: 24px; */
   height: auto;
   width: auto;
 }
 
 nz-footer {
   text-align: center;
+  background: #fff;
 }
 
 .inner-content {
@@ -41,6 +42,7 @@ nz-header {
   position: sticky;
   top: 0;
   background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 21, 41, 0.08);
 }
 
 .menu-bar {
@@ -51,4 +53,8 @@ nz-header {
 .menu-right {
   margin-left: auto;
   display: flex;
+}
+
+nz-layout {
+  background: #fff;
 }

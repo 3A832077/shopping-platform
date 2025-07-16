@@ -43,3 +43,31 @@
 .category-container:hover .overlay {
   opacity: 1;
 }
+
+h4{
+  text-align: center;
+  padding-bottom: 20px;
+}
+
+.product-container {
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  border-radius: 12px;
+  padding: 16px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(.4,0,.2,1), box-shadow 0.2s;
+}
+
+.product-container:hover {
+  transform: scale(1.011);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.18);
+}
+
+.product-info{
+  text-align: center;
+  margin-top: 10px;
+}

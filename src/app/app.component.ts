@@ -8,6 +8,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { SupabaseService } from './service/supabase.service';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 @Component({
     selector: 'app-root',
@@ -15,7 +16,8 @@ import { SupabaseService } from './service/supabase.service';
     imports: [
                 RouterOutlet, NzCarouselModule, NzGridModule,
                 NzIconModule, NzCardModule, NzLayoutModule,
-                CommonModule, RouterLink, NzDropDownModule
+                CommonModule, RouterLink, NzDropDownModule,
+                NzDividerModule
               ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.css'

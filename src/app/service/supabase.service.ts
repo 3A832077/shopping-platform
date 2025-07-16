@@ -95,10 +95,20 @@ export class SupabaseService {
    * 取得產品類別
    */
   getCategories() {
-    return this.supabase?.from('categories').select('*');
+    return this.supabase?.from('categories').select('*').order('id', { ascending: true });
   }
 
-
+  /**
+   * 取得產品列表
+   * @param page
+   * @param limit
+   */
+  getProducts(page: number, limit: number) {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    return this.supabase?.from('products').select('*',
+      { count: 'exact' }).order('update', { ascending: false }).order('id').range(from, to);
+  }
 
 
 }

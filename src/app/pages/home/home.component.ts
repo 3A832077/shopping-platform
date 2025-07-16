@@ -3,13 +3,17 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { SupabaseService } from '../../service/supabase.service';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-home',
   imports: [
     NzLayoutModule,
     NzGridModule,
-    NzDividerModule
+    NzDividerModule,
+    NzButtonModule,
+    MatButtonModule,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
@@ -18,27 +22,48 @@ export class HomeComponent implements OnInit {
 
   categoryList: any[] = [];
 
+  productsList: any[] = [];
+
   constructor(
                 private supabaseService: SupabaseService
              ) { }
 
   ngOnInit(): void {
-    this.getCategories();
+    this.getCategory();
   }
 
   /**
    * 取得產品類別
    */
-  async getCategories() {
-    const res = this.supabaseService?.getCategories();
-    res?.then((data: any) => {
-      if (data.error) {
-        console.error(data.error);
+  getCategory(){
+    this.supabaseService?.getCategories()?.then(({ data, error }) => {
+      if (error) {
+        console.error(error);
+        return;
       }
-      else {
-        this.categoryList = data;
-      }
+      this.categoryList = data || [];
+      this.getProoducts();
     });
+  }
+
+  /**
+   * 取得產品列表
+   */
+  getProoducts(){
+    this.supabaseService?.getProducts(1, 5)?.then(({ data, error }) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      this.productsList = data || [];
+    });
+  }
+
+  /**
+   * 前往產品頁面
+   */
+  toProduct(){
+    window.location.href = '/product';
   }
 
 

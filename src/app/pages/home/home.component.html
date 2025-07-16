@@ -1,4 +1,4 @@
-<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true">
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true" style="padding: 10px;">
   <div class="carousel-indicators">
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
     <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -6,13 +6,13 @@
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/img/Love.jpg" class="d-block w-100">
+      <img src="/img/cd.jpg" class="d-block w-100">
     </div>
     <div class="carousel-item">
-      <img src="/img/handle.jpg" class="d-block w-100">
+      <img src="/img/game.jpg" class="d-block w-100">
     </div>
     <div class="carousel-item">
-      <img src="/img/CRM.jpg" class="d-block w-100">
+      <img src="/img/book.jpg" class="d-block w-100">
     </div>
   </div>
   <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -26,11 +26,11 @@
 </div>
 <nz-divider></nz-divider>
 <div class="row pt-2">
-  <h4 style="text-align: center;">商品分類</h4>
-    @for (item of categoryList; track $index) {
+  <h4>商品分類</h4>
+    @for (item of categoryList; track item) {
       <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center">
         <div class="category-container">
-          <img src="/img/Love.jpg" class="img-fluid categoryImg"/>
+          <img src="/img/{{ item.img }}.jpg" class="img-fluid categoryImg"/>
           <div class="overlay">
             <div class="overlay-text">{{ item.name }}</div>
           </div>
@@ -38,3 +38,23 @@
       </div>
     }
 </div>
+<nz-divider></nz-divider>
+<div class="row pt-2">
+  <h4>最新商品</h4>
+    @for (item of productsList; track $index) {
+      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center">
+        <div class="product-container">
+          <img src="{{ item.imageUrl }}" class="img-fluid"/>
+          <div class="product-info">
+            <p>{{ item.name }}</p>
+            <p>NT${{ item.price }}</p>
+            <button matButton="elevated">購買</button>
+          </div>
+        </div>
+      </div>
+    }
+</div>
+<div class="text-center mt-4 mb-2">
+  <button matButton="elevated" (click)="toProduct()">查看所有產品</button>
+</div>
+
