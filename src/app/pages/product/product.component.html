@@ -1,0 +1,50 @@
+<div class="container mt-4">
+  <!-- 小畫面：篩選器與排序 -->
+  <div class="row align-items-center mb-3 d-md-none">
+    <div class="col-6">
+      <p class="mb-0 cursor-pointer" (click)="toggleFilter()">
+        <nz-icon nzType="unordered-list" /> 篩選器
+      </p>
+    </div>
+    <div class="col-6 text-end">
+      <p class="mb-0">排序依據</p>
+    </div>
+  </div>
+
+  <!-- 篩選器區（RWD 控制） -->
+  <div class="row mb-3">
+    <!-- 篩選器：小畫面要 toggle，桌面固定 -->
+    <div
+      class="col-12 col-md-3 col-lg-2"
+      [class.d-none]="!filterOpen && isSmallScreen">
+      <div class="filter-sidebar">
+        <p class="mb-3">篩選器</p>
+        <nz-divider />
+        <p>類別 +</p>
+        <nz-divider />
+        <p>價格 +</p>
+        <nz-divider />
+        <p><nz-icon nzType="redo"/>清除篩選條件</p>
+      </div>
+    </div>
+
+    <!-- 商品區與排序 -->
+    <div class="col-12 col-md-9 col-lg-10">
+      <div class="text-end mb-3 d-none d-md-block">
+        <p class="mb-0">排序依據</p>
+      </div>
+      <div class="row">
+        @for (product of productsList; track $index) {
+          <div class="col-6 col-lg-4 col-xl-3 mb-4">
+            <div class="p-2 text-center">
+              <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
+              </div>
+              <div>{{ product.name }}</div>
+              <div>{{ product.price }}</div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

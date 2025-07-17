@@ -9,12 +9,15 @@ import {
   AuditOutline,
   PlusOutline,
   InfoCircleOutline,
-  GoogleOutline
+  GoogleOutline,
+  UnorderedListOutline,
+  RedoOutline
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
   MenuFoldOutline, MenuUnfoldOutline, FormOutline,
   ShoppingOutline, MenuOutline, BarChartOutline,
   SolutionOutline, AuditOutline, PlusOutline,
-  InfoCircleOutline, GoogleOutline
+  InfoCircleOutline, GoogleOutline, UnorderedListOutline,
+  RedoOutline
 ];
