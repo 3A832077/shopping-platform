@@ -40,7 +40,7 @@ export class ProductComponent implements OnInit {
 
   isSmallScreen = false;
 
-  selectSort: string = 'default'; // 預設排序方式
+  selectSort: string = 'default';
 
   constructor(
                 private supabaseService: SupabaseService
@@ -51,17 +51,17 @@ export class ProductComponent implements OnInit {
     if (typeof window !== 'undefined') {
       this.isSmallScreen = window.innerWidth < 768;
       if (!this.isSmallScreen) {
-        this.filterOpen = true; // 桌面版直接展開
+        this.filterOpen = true;
       }
       else {
-        this.filterOpen = false; // 小畫面預設收起
+        this.filterOpen = false;
       }
     }
   }
 
   ngOnInit(): void {
     this.getCategory();
-    this.onResize(); // 初始化時檢查螢幕大小
+    this.onResize();
   }
 
   toggleFilter() {

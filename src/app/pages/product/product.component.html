@@ -3,35 +3,45 @@
   <div class="row align-items-center mb-3 d-md-none">
     <div class="col-6">
       <p class="mb-0 cursor-pointer" (click)="toggleFilter()">
-        <nz-icon nzType="unordered-list" /> 篩選器
+        <nz-icon nzType="unordered-list"/> 篩選器
       </p>
     </div>
     <div class="col-6 text-end">
-      <p class="mb-0">排序依據</p>
+      <p class="mb-0">排序依據
+        <nz-select [(ngModel)]="selectSort" (ngModelChange)="getProducts()" [nzBorderless]="true" ngSkipHydration >
+          <nz-option nzValue="default" nzLabel="預設"></nz-option>
+          <nz-option nzValue="time_asc" nzLabel="上架時間新到舊"></nz-option>
+          <nz-option nzValue="time_desc" nzLabel="上架時間舊到新"></nz-option>
+        </nz-select>
+      </p>
     </div>
   </div>
 
   <!-- 篩選器區（RWD 控制） -->
   <div class="row mb-3">
     <!-- 篩選器：小畫面要 toggle，桌面固定 -->
-    <div
-      class="col-12 col-md-3 col-lg-2"
-      [class.d-none]="!filterOpen && isSmallScreen">
+    <div class="col-12 col-md-3 col-lg-2" [class.d-none]="!filterOpen && isSmallScreen">
       <div class="filter-sidebar">
-        <p class="mb-3">篩選器</p>
+        <p class="mb-3"><nz-icon nzType="unordered-list"/> 篩選器</p>
         <nz-divider />
-        <p>類別 +</p>
+        <p>類別</p>
         <nz-divider />
-        <p>價格 +</p>
+        <p>價格</p>
         <nz-divider />
-        <p><nz-icon nzType="redo"/>清除篩選條件</p>
+        <p><nz-icon nzType="redo"/> 清除篩選條件</p>
       </div>
     </div>
 
     <!-- 商品區與排序 -->
     <div class="col-12 col-md-9 col-lg-10">
       <div class="text-end mb-3 d-none d-md-block">
-        <p class="mb-0">排序依據</p>
+        <p class="mb-0">排序依據
+        <nz-select [(ngModel)]="selectSort" [nzBorderless]="true" ngSkipHydration >
+          <nz-option nzValue="default" nzLabel="預設"></nz-option>
+          <nz-option nzValue="asc" nzLabel="上架時間新到舊"></nz-option>
+          <nz-option nzValue="desc" nzLabel="上架時間舊到新"></nz-option>
+        </nz-select>
+      </p>
       </div>
       <div class="row">
         @for (product of productsList; track $index) {
@@ -40,7 +50,7 @@
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
               </div>
               <div>{{ product.name }}</div>
-              <div>{{ product.price }}</div>
+              <div>${{ product.price }}</div>
             </div>
           </div>
         }
