@@ -8,6 +8,9 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FormsModule } from '@angular/forms';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-product',
@@ -19,7 +22,10 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     NzSelectModule,
     NzIconModule,
-    FormsModule
+    FormsModule,
+    NzCheckboxModule,
+    NzInputNumberModule,
+    RouterLink
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
@@ -41,6 +47,14 @@ export class ProductComponent implements OnInit {
   isSmallScreen = false;
 
   selectSort: string = 'default';
+
+  categoryIsExpanded = false;
+
+  priceIsExpanded = false;
+
+  minPrice: number = 0;
+
+  maxPrice: number = 0;
 
   constructor(
                 private supabaseService: SupabaseService

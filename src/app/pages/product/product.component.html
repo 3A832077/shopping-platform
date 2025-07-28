@@ -8,7 +8,7 @@
     </div>
     <div class="col-6 text-end">
       <p class="mb-0">排序依據
-        <nz-select [(ngModel)]="selectSort" (ngModelChange)="getProducts()" [nzBorderless]="true" ngSkipHydration >
+        <nz-select [(ngModel)]="selectSort" (ngModelChange)="getProducts()" [nzBorderless]="true" ngSkipHydration>
           <nz-option nzValue="default" nzLabel="預設"></nz-option>
           <nz-option nzValue="time_asc" nzLabel="上架時間新到舊"></nz-option>
           <nz-option nzValue="time_desc" nzLabel="上架時間舊到新"></nz-option>
@@ -22,11 +22,39 @@
     <!-- 篩選器：小畫面要 toggle，桌面固定 -->
     <div class="col-12 col-md-3 col-lg-2" [class.d-none]="!filterOpen && isSmallScreen">
       <div class="filter-sidebar">
-        <p class="mb-3"><nz-icon nzType="unordered-list"/> 篩選器</p>
+        <p class="mb-3 d-none d-md-block"><nz-icon nzType="unordered-list"/> 篩選器</p>
+        <nz-divider class="d-none d-md-block"/>
+
+        <div class="filter-block">
+          <div class="filter-header" (click)="categoryIsExpanded = !categoryIsExpanded">
+            <span>產品類型</span>
+            <i nz-icon [nzType]="categoryIsExpanded ? 'minus' : 'plus'"></i>
+          </div>
+
+          <div *ngIf="categoryIsExpanded" class="filter-content">
+            <label nz-checkbox *ngFor="let item of categoryList" [(ngModel)]="item.checked">
+              {{ item.name }}
+            </label>
+          </div>
+        </div>
+
         <nz-divider />
-        <p>類別</p>
-        <nz-divider />
-        <p>價格</p>
+
+        <div class="filter-block">
+          <div class="filter-header" (click)="priceIsExpanded = !priceIsExpanded">
+            <span>價格</span>
+            <i nz-icon [nzType]="priceIsExpanded ? 'minus' : 'plus'"></i>
+          </div>
+
+          <div *ngIf="priceIsExpanded" class="filter-content">
+            <div class="d-flex align-items-center">
+              <nz-input-number class="me-2" [(ngModel)]="minPrice"></nz-input-number>
+              <span class="mx-1">-</span>
+              <nz-input-number class="ms-2" [(ngModel)]="maxPrice"></nz-input-number>
+            </div>
+          </div>
+        </div>
+
         <nz-divider />
         <p><nz-icon nzType="redo"/> 清除篩選條件</p>
       </div>
@@ -36,7 +64,7 @@
     <div class="col-12 col-md-9 col-lg-10">
       <div class="text-end mb-3 d-none d-md-block">
         <p class="mb-0">排序依據
-        <nz-select [(ngModel)]="selectSort" [nzBorderless]="true" ngSkipHydration >
+        <nz-select [(ngModel)]="selectSort" [nzBorderless]="true" ngSkipHydration (ngModelChange)="getProducts()">
           <nz-option nzValue="default" nzLabel="預設"></nz-option>
           <nz-option nzValue="asc" nzLabel="上架時間新到舊"></nz-option>
           <nz-option nzValue="desc" nzLabel="上架時間舊到新"></nz-option>
@@ -45,8 +73,8 @@
       </div>
       <div class="row">
         @for (product of productsList; track $index) {
-          <div class="col-6 col-lg-4 col-xl-3 mb-4">
-            <div class="p-2 text-center">
+          <div class="col-6 col-lg-4 col-xl-3 mb-4" >
+            <div class="p-2 text-center" [routerLink]="[product.id]" style="cursor: pointer;">
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
               </div>
               <div>{{ product.name }}</div>

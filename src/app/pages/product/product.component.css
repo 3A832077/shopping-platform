@@ -77,3 +77,24 @@ p{
   background-position: center;
   border-radius: 8px;
 }
+
+.filter-block {
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-content {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

@@ -109,5 +109,13 @@ export class SupabaseService {
     return this.supabase?.from('products').select('*',{ count: 'exact' }).order('update', { ascending: sort }).order('id').range(from, to);
   }
 
+  /**
+   * 取得產品詳細資訊
+   * @param id
+   */
+  getProductById(id: number) {
+    return this.supabase?.from('products').select('*').eq('id', id).single();
+  }
+
 
 }
