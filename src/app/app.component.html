@@ -2,18 +2,18 @@
   <nz-header nzTheme="light">
     <div class="logo">
       <a routerLink="/home">
-        <img src="/img/icon.png" alt="Logo" width="85px" height="60px"/>
+        <img src="/img/icon.png" alt="Logo" width="85px" height="50px"/>
       </a>
     </div>
     <ul nz-menu nzTheme="light" nzMode="horizontal" class="menu-bar">
       <div class="menu-right">
-        <li nz-menu-item>購物車</li>
+        <li nz-menu-item routerLink="/cart" [nzSelected]="isActive('/cart')">購物車</li>
         <li nz-menu-item>訂單紀錄</li>
         @if (userId && email) {
           <li nz-menu-item (click)="logout()">登出</li>
         }
         @else {
-          <li nz-menu-item routerLink="/login">登入</li>
+          <li nz-menu-item routerLink="/login" [nzSelected]="isActive('/login')">登入</li>
         }
       </div>
     </ul>

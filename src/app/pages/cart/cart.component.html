@@ -1,1 +1,56 @@
-<p>cart works!</p>
+<div class="container mt-4">
+  <div class="mb-3 d-flex justify-content-center">
+    <button matButton routerLink="/home">
+      繼續選購
+      <mat-icon>home</mat-icon>
+    </button>
+  </div>
+
+  <div class="row">
+    <!-- 商品列表 -->
+    <div class="col-12 col-md-8 mb-4">
+      <div class="p-3">
+        <div class="d-flex mb-3">
+          <div class="me-3">
+            <div class="product-img border rounded"></div>
+            <div class="mt-2 text-muted">預計在 送達</div>
+          </div>
+
+          <div class="flex-grow-1">
+            <div class="fw-bold">商品名稱</div>
+            <div>數量：1</div>
+            <div class="text-muted">價格</div>
+
+            <div class="mt-2 d-flex gap-3">
+              <a href="#">下次再買</a>
+              <a href="#" class="text-danger">移除</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 訂單摘要 -->
+    <div class="col-12 col-md-4">
+      <div class="p-3">
+        <h5 class="fw-bold mb-3">訂單摘要</h5>
+        <div class="d-flex justify-content-between">
+          <span>小計：</span>
+          <span></span>
+        </div>
+        <div class="d-flex justify-content-between">
+          <span>運費</span>
+          <span></span>
+        </div>
+        <hr />
+        <div class="d-flex justify-content-between fw-bold">
+          <span>預估總金額</span>
+          <span></span>
+        </div>
+
+        <button matButton="tonal">結帳</button>
+      </div>
+    </div>
+  </div>
+</div>
+

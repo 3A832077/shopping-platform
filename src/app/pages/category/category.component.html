@@ -8,8 +8,7 @@
     </div>
     <div class="col-6 text-end">
       <p class="mb-0">排序依據
-        <nz-select [(ngModel)]="selectSort"
-          (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, minPrice, maxPrice)"
+        <nz-select [(ngModel)]="selectSort" (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, minPrice, maxPrice)"
           [nzBorderless]="true" ngSkipHydration>
           <nz-option [nzValue]="false" nzLabel="預設"></nz-option>
           <nz-option [nzValue]="true" nzLabel="最舊"></nz-option>
@@ -27,21 +26,6 @@
         <nz-divider class="d-none d-md-block"/>
 
         <div class="filter-block">
-          <div class="filter-header" (click)="categoryIsExpanded = !categoryIsExpanded">
-            <span>產品類型</span>
-            <i nz-icon [nzType]="categoryIsExpanded ? 'minus' : 'plus'"></i>
-          </div>
-
-          <div *ngIf="categoryIsExpanded" class="filter-content">
-            <label nz-checkbox *ngFor="let item of categoryList" [(ngModel)]="item.checked" (ngModelChange)="onCheckboxChange()">
-              {{ item.name }}
-            </label>
-          </div>
-        </div>
-
-        <nz-divider />
-
-        <div class="filter-block">
           <div class="filter-header" (click)="priceIsExpanded = !priceIsExpanded">
             <span>價格</span>
             <i nz-icon [nzType]="priceIsExpanded ? 'minus' : 'plus'"></i>
@@ -52,7 +36,7 @@
               <nz-input-number class="me-2" [(ngModel)]="minPrice" [nzMin]="0"></nz-input-number>
               <span class="mx-1">-</span>
               <nz-input-number class="ms-2" [(ngModel)]="maxPrice" [nzMin]="0"
-                (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, selectCategory, minPrice, maxPrice)">
+                (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, minPrice, maxPrice)">
               </nz-input-number>
             </div>
           </div>
@@ -78,7 +62,7 @@
       <div class="row">
         @for (product of productsList; track $index) {
           <div class="col-6 col-lg-4 col-xl-3 mb-4" >
-            <div class="p-2 text-center" [routerLink]="[product.id]" style="cursor: pointer;">
+            <div class="p-2 text-center" routerLink="/product/{{product.id}}" style="cursor: pointer;">
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
               </div>
               <div>{{ product.name }}</div>
@@ -89,8 +73,8 @@
         <div class="col-12 d-flex justify-content-end">
           <nz-pagination [nzPageSize]="pageSize" [nzPageIndex]="pageIndex" [nzTotal]="productsList.length"
             [nzShowSizeChanger]="true" [nzPageSizeOptions]="[10, 20, 30, 40, 50]"
-            (nzPageIndexChange)="getProducts($event, pageSize, selectSort, selectCategory, minPrice, maxPrice)"
-            (nzPageSizeChange)="getProducts(pageIndex, $event, selectSort, selectCategory, minPrice, maxPrice)">
+            (nzPageIndexChange)="getProducts($event, pageSize, selectSort, minPrice, maxPrice)"
+            (nzPageSizeChange)="getProducts(pageIndex, $event, selectSort, minPrice, maxPrice)">
           </nz-pagination>
         </div>
       </div>

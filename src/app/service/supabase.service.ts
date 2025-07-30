@@ -103,10 +103,22 @@ export class SupabaseService {
    * @param page
    * @param limit
    */
-  getProducts(page: number, limit: number, sort: boolean = false) {
+  getProducts(page: number = 1, limit: number = 10, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    return this.supabase?.from('products').select('*',{ count: 'exact' }).order('update', { ascending: sort }).order('id').range(from, to);
+    let query = this.supabase?.from('products').select('*', { count: 'exact' });
+
+    if (Array.isArray(category) && category.length > 0) {
+      query = query?.in('category', category);
+    }
+    if (minPrice !== undefined && minPrice !== null) {
+      query = query?.gte('price', minPrice);
+    }
+    if (maxPrice !== undefined && maxPrice !== null && maxPrice > 0) {
+      query = query?.lte('price', maxPrice);
+    }
+
+    return query?.order('update', { ascending: sort }).order('id').range(from, to);
   }
 
   /**
@@ -117,5 +129,19 @@ export class SupabaseService {
     return this.supabase?.from('products').select('*').eq('id', id).single();
   }
 
+  /**
+   * 取得同類別商品
+   * @param id
+   */
+  getRelatedProducts(id: number) {
+    return this.supabase?.from('products').select('*').eq('category', id);
+  }
+
+  /**
+   * 取得購物車商品
+   */
+  getCartItems() {
+    return this.supabase?.from('cart').select('*').eq('user_id', this.userId$.getValue());
+  }
 
 }

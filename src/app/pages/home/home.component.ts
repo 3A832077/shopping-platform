@@ -5,6 +5,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -14,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
     NzDividerModule,
     NzButtonModule,
     MatButtonModule,
+    RouterLink
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

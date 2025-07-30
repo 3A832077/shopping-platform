@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit } from '@angular/core';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
@@ -10,37 +10,39 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FormsModule } from '@angular/forms';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 
 @Component({
-  selector: 'app-product',
+  selector: 'app-category',
   imports: [
+    CommonModule,
     NzCollapseModule,
     NzButtonModule,
     NzDividerModule,
     NzGridModule,
-    CommonModule,
     NzSelectModule,
     NzIconModule,
     FormsModule,
     NzCheckboxModule,
     NzInputNumberModule,
     RouterLink,
-    NzPaginationModule
+    NzPaginationModule,
+    NzPageHeaderModule
   ],
-  templateUrl: './product.component.html',
-  styleUrl: './product.component.css'
+  templateUrl: './category.component.html',
+  styleUrl: './category.component.css'
 })
-export class ProductComponent implements OnInit {
+export class CategoryComponent implements OnInit {
+
+  @Input() id: number = 0;
 
   productsList : any[] = [];
 
   pageIndex: number = 1;
 
   pageSize: number = 10;
-
-  categoryList: any[] = [];
 
   selectedSort = 'default';
 
@@ -50,18 +52,15 @@ export class ProductComponent implements OnInit {
 
   selectSort: boolean = false;
 
-  categoryIsExpanded = false;
-
   priceIsExpanded = false;
 
   minPrice: number = 0;
 
   maxPrice: number = 0;
 
-  selectCategory: any;
-
   constructor(
-                private supabaseService: SupabaseService
+                private supabaseService: SupabaseService,
+                private router: Router
              ) { }
 
   @HostListener('window:resize')
@@ -89,25 +88,27 @@ export class ProductComponent implements OnInit {
     this.filterOpen = !this.filterOpen;
   }
 
-  /**
-   * 類別篩選
+   /**
+   * 取得該類別所有商品
+   * @param id
    */
-  onCheckboxChange() {
-    this.selectCategory = this.categoryList.filter(item => item.checked).map(item => item.id);
-    if (this.selectCategory.length === 0) {
-      this.selectCategory = undefined;
-    }
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory);
+  getCategory(){
+    this.supabaseService?.getRelatedProducts(this.id)?.then(({ data, error }) => {
+      if (error) {
+        console.error(error);
+        return;
+      }
+      this.productsList = data || [];
+      this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.minPrice, this.maxPrice);
+    });
   }
 
   /**
    * 取得產品列表
-   * @param pageIndex
-   * @param pageSize
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number) {
-    sort = this.selectSort === true ? true : false;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, error }) => {
+  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, minPrice?: number, maxPrice?: number) {
+    sort = this.selectSort === false ? false : true;
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, minPrice, maxPrice)?.then(({ data, error }) => {
       if (error) {
         console.error(error);
         return;
@@ -116,31 +117,23 @@ export class ProductComponent implements OnInit {
     });
   }
 
-   /**
-   * 取得產品類別
-   */
-  getCategory(){
-    this.supabaseService?.getCategories()?.then(({ data, error }) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      this.categoryList = data || [];
-      this.getProducts();
-    });
-  }
-
   /**
    * 清除篩選條件
    */
   resetFilter() {
+    this.pageIndex = 1;
+    this.pageSize = 10;
     this.selectSort = false;
-    this.categoryList.forEach(item => item.checked = false);
     this.minPrice = 0;
     this.maxPrice = 0;
-    this.selectCategory = undefined;
-    this.getProducts();
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.minPrice, this.maxPrice);
   }
 
+  /**
+   * 返回上一頁
+   */
+  onBack() {
+    this.router.navigate(['/category']);
+  }
 
 }

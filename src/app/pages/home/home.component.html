@@ -28,7 +28,7 @@
 <div class="row pt-2">
   <h4>商品分類</h4>
     @for (item of categoryList; track item) {
-      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center">
+      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center" routerLink="/category/{{ item.id }}">
         <div class="category-container">
           <img src="/img/{{ item.img }}.jpg" class="img-fluid categoryImg"/>
           <div class="overlay">
@@ -42,7 +42,7 @@
 <div class="row pt-2">
   <h4>最新商品</h4>
     @for (item of productsList; track $index) {
-      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center">
+      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center" routerLink="/product/{{ item.id }}">
         <div class="product-container">
           <img src="{{ item.imageUrl }}" class="img-fluid"/>
           <div class="product-info">

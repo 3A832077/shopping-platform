@@ -31,7 +31,8 @@ export class AppComponent implements OnInit {
   email: string | null = null;
 
   constructor(
-                private supabaseService: SupabaseService
+                private supabaseService: SupabaseService,
+                private router: Router
              ){
                 this.supabaseService.userId$.subscribe(userId => {
                   this.userId = userId;
@@ -55,5 +56,16 @@ export class AppComponent implements OnInit {
       window.location.href = '/login';
     });
   }
+
+  /**
+  * 僅當前路徑完全相等時返回 true
+  * @param url
+  * @returns
+  */
+  isActive(url: string): boolean {
+    return this.router.url === url;
+  }
+
+
 
 }
