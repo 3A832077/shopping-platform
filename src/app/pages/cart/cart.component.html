@@ -1,56 +1,73 @@
-<div class="container mt-4">
-  <div class="mb-3 d-flex justify-content-center">
-    <button matButton routerLink="/home">
-      繼續選購
-      <mat-icon>home</mat-icon>
-    </button>
-  </div>
+<div class="container py-4">
+  @if (cartItems.length !== 0) {
+    <div class="text-center mb-4">
+      <button matButton routerLink="/home">
+        繼續選購<mat-icon>home</mat-icon>
+      </button>
+    </div>
 
-  <div class="row">
-    <!-- 商品列表 -->
-    <div class="col-12 col-md-8 mb-4">
-      <div class="p-3">
-        <div class="d-flex mb-3">
-          <div class="me-3">
-            <div class="product-img border rounded"></div>
-            <div class="mt-2 text-muted">預計在 送達</div>
-          </div>
+    <div class="row gy-4 d-flex justify-content-center">
+      <div class="col-12 col-md-5 col-lg-5">
+        @for (item of cartItems; track $index) {
+          <div class="bg-white rounded p-3 shadow-sm">
+            <div class="d-flex flex-column flex-md-row">
+              <img src="{{item.products.imageUrl}}"
+                class="rounded me-md-3 mb-3 mb-md-0" width="150px" height="150px"/>
 
-          <div class="flex-grow-1">
-            <div class="fw-bold">商品名稱</div>
-            <div>數量：1</div>
-            <div class="text-muted">價格</div>
+              <div class="flex-grow-1">
+                <div class="d-flex">
+                  <div>
+                    <div class="fw-bold fs-5" routerLink="/product/{{item.products.id}}" style="cursor: pointer;">
+                      {{item.products.name}}
+                    </div>
+                    <div class="mt-4 d-flex flex-column flex-md-row justify-content-between" >
+                      <nz-form-item>
+                        <span class="fw-bold me-2">數量：</span>
+                        <nz-input-number [(ngModel)]="item.quantity" [nzMin]="1" [nzMax]="item.products.stock"
+                          (ngModelChange)="updateCartItem(item.id, $event)" nzVariant="underlined"/>
+                      </nz-form-item>
+                      <div class="fw-bold fs-5 text-nowrap">${{item.products.price}}</div>
+                    </div>
+                  </div>
+                </div>
 
-            <div class="mt-2 d-flex gap-3">
-              <a href="#">下次再買</a>
-              <a href="#" class="text-danger">移除</a>
+                <div class="mt-4 d-flex gap-4 justify-content-end">
+                  <a class="text-danger" (click)="removeCartItem(item.id)">移除</a>
+                </div>
+              </div>
             </div>
           </div>
+        }
+
+      </div>
+
+      <div class="col-12 col-md-4 col-lg-4">
+        <div class="bg-white rounded p-4 shadow-sm">
+          <h5 class="fw-bold mb-3">訂單摘要</h5>
+          <div class="d-flex justify-content-between">
+            <span>小計</span>
+            <span>${{ sum }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>運費</span>
+            <span>$0</span>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between fw-bold">
+            <span>預估總金額</span>
+            <span>${{ sum }}</span>
+          </div>
+          <button matButton="tonal" class="w-100 mt-3 rounded-pill" routerLink="/checkout">結帳</button>
         </div>
       </div>
     </div>
-
-    <!-- 訂單摘要 -->
-    <div class="col-12 col-md-4">
-      <div class="p-3">
-        <h5 class="fw-bold mb-3">訂單摘要</h5>
-        <div class="d-flex justify-content-between">
-          <span>小計：</span>
-          <span></span>
-        </div>
-        <div class="d-flex justify-content-between">
-          <span>運費</span>
-          <span></span>
-        </div>
-        <hr />
-        <div class="d-flex justify-content-between fw-bold">
-          <span>預估總金額</span>
-          <span></span>
-        </div>
-
-        <button matButton="tonal">結帳</button>
+  }
+  @else if (cartItems.length === 0) {
+    <div class="text-center mt-4">
+      <div class="mb-3 d-flex justify-content-center align-items-center">
+        <h4 class="fw-bold">購物車是空的</h4>
       </div>
+      <button matButton routerLink="/home">返回首頁</button>
     </div>
-  </div>
+  }
 </div>
-

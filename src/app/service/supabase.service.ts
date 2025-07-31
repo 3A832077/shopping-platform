@@ -141,7 +141,38 @@ export class SupabaseService {
    * 取得購物車商品
    */
   getCartItems() {
-    return this.supabase?.from('cart').select('*').eq('user_id', this.userId$.getValue());
+    return this.supabase?.from('cart').select(`id, product_id, quantity,
+      products (id, name, price, imageUrl, stock)`).eq('user_id', this.userId$.getValue());
+  }
+
+  /**
+   * 新增商品到購物車
+   * @param productId
+   * @param quantity
+   */
+  addToCart(productId: number, quantity: number) {
+    return this.supabase?.from('cart').insert({
+      user_id: this.userId$.getValue(),
+      product_id: productId,
+      quantity: quantity,
+    });
+  }
+
+  /**
+   * 移除購物車商品
+   * @param itemId
+   */
+  removeCartItem(itemId: string) {
+    return this.supabase?.from('cart').delete().eq('id', itemId);
+  }
+
+  /**
+   * 更新購物車商品數量
+   * @param itemId
+   * @param quantity
+   */
+  updateCartItem(itemId: string, quantity: number) {
+    return this.supabase?.from('cart').update({ quantity }).eq('id', itemId);
   }
 
 }

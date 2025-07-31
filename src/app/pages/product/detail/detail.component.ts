@@ -8,6 +8,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-detail',
@@ -18,7 +22,10 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
     CommonModule,
     MatButtonModule,
     RouterLink,
-    NzPageHeaderModule
+    NzPageHeaderModule,
+    NzInputNumberModule,
+    FormsModule,
+    ReactiveFormsModule
   ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.css'
@@ -31,10 +38,13 @@ export class DetailComponent implements OnInit {
 
   relatedProducts: any[] = [];
 
+  quantity: number = 1;
+
   constructor(
                 private supabaseService: SupabaseService,
                 private route: ActivatedRoute,
-                private router: Router
+                private router: Router,
+                private message: NzMessageService
              ) { }
 
   ngOnInit(): void {
@@ -79,4 +89,22 @@ export class DetailComponent implements OnInit {
   onBack() {
     this.router.navigate(['/product']);
   }
+
+  /**
+   * 新增商品到購物車
+   */
+  addToCart(productId: number, quantity: number = 1, buyNow: boolean = false) {
+    this.supabaseService.addToCart(productId, quantity)?.then(({ data, error }) => {
+      if (error) {
+        console.error('Error adding product to cart:', error);
+      }
+      else {
+        this.message.success('已加入購物車！');
+        if (buyNow) {
+          this.router.navigate(['/cart']);
+        }
+      }
+    });
+  }
+
 }

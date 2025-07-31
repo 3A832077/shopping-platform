@@ -89,6 +89,7 @@ export class LoginComponent implements OnInit {
         console.error(result.error);
       }
       else {
+        this.message.success('註冊成功，請查看電子郵件確認連結');
         window.location.href = '/login';
       }
     }
