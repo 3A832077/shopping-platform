@@ -8,6 +8,9 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NzFormItemComponent } from "ng-zorro-antd/form";
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { CheckoutComponent } from '../checkout/checkout.component';
 
 @Component({
   selector: 'app-cart',
@@ -18,7 +21,8 @@ import { NzFormItemComponent } from "ng-zorro-antd/form";
     NzInputNumberModule,
     FormsModule,
     ReactiveFormsModule,
-    NzFormItemComponent
+    NzFormItemComponent,
+    NzModalModule
 ],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css'
@@ -29,12 +33,19 @@ export class CartComponent implements OnInit {
 
   sum: number = 0;
 
+  userId: string | null = null;
+
   constructor(
-    private supabaseService: SupabaseService
+    private supabaseService: SupabaseService,
+    private messageService: NzMessageService,
+    private modalService: NzModalService
   ) { }
 
   ngOnInit(): void {
     this.getCartItems();
+    this.supabaseService.userId$.subscribe(userId => {
+      this.userId = userId;
+    });
   }
 
   /**
@@ -46,6 +57,10 @@ export class CartComponent implements OnInit {
         console.error(error);
       }
       else {
+        if (!this.userId){
+          this.messageService.info('請先登入');
+          return;
+        }
         this.cartItems = data || [];
         this.sum = this.cartItems.reduce((acc, item) => {
           return acc + (item.products.price * item.quantity);
@@ -78,6 +93,24 @@ export class CartComponent implements OnInit {
       }
       else {
         this.getCartItems();
+      }
+    });
+  }
+
+  /**
+   * 打開結帳視窗
+   */
+  openCheckout(): void {
+    this.modalService.create({
+      nzTitle: '結帳',
+      nzContent: CheckoutComponent,
+      nzCentered: true,
+      nzMaskClosable: false,
+      nzFooter: null,
+      nzWidth: '650px',
+      nzData: {
+        cartItems: this.cartItems,
+        total: this.sum
       }
     });
   }

@@ -57,7 +57,7 @@
             <span>預估總金額</span>
             <span>${{ sum }}</span>
           </div>
-          <button matButton="tonal" class="w-100 mt-3 rounded-pill" routerLink="/checkout">結帳</button>
+          <button matButton="tonal" class="w-100 mt-3 rounded-pill" (click)="openCheckout()">結帳</button>
         </div>
       </div>
     </div>
@@ -67,7 +67,12 @@
       <div class="mb-3 d-flex justify-content-center align-items-center">
         <h4 class="fw-bold">購物車是空的</h4>
       </div>
-      <button matButton routerLink="/home">返回首頁</button>
+      @if (!userId) {
+        <button matButton routerLink="/login">登入</button>
+      }
+      @else {
+        <button matButton routerLink="/home">返回首頁</button>
+      }
     </div>
   }
 </div>

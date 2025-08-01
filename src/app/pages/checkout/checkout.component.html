@@ -1,1 +1,99 @@
+<nz-steps [nzCurrent]="current">
+  <nz-step nzTitle="確認商品" nzDescription="檢查訂單內容"></nz-step>
+  <nz-step nzTitle="寄送方式" nzDescription="選擇寄送方式"></nz-step>
+  <nz-step nzTitle="付款方式" nzDescription="選擇付款方式"></nz-step>
+  <nz-step nzTitle="完成訂單" nzDescription="訂單已送出"></nz-step>
+</nz-steps>
 
+<div class="steps-content mt-4">
+  @switch (current) {
+    @case (0) {
+      <div class="col-12">
+        <div class="bg-white rounded p-4 shadow-sm">
+          <h5 class="fw-bold mb-3">訂單摘要</h5>
+          @for (item of cartItems; track $index) {
+            <div class="d-flex justify-content-between mb-2">
+              <span>{{ item.products.name }} ({{ item.quantity }})</span>
+              <span>${{ item.products.price }}</span>
+            </div>
+          }
+          <div class="d-flex justify-content-between">
+            <span>小計</span>
+            <span>${{ total }}</span>
+          </div>
+          <div class="d-flex justify-content-between">
+            <span>運費</span>
+            <span>$0</span>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between fw-bold">
+            <span>預估總金額</span>
+            <span>${{ total }}</span>
+          </div>
+        </div>
+      </div>
+    }
+    @case (1) {
+      <div class="col-12">
+        <p>請選擇您的寄送方式：</p>
+        <nz-radio-group [(ngModel)]="shippingMethod">
+          <label nz-radio nzValue="home">宅配</label>
+          <label nz-radio nzValue="711">7-11取貨</label>
+        </nz-radio-group>
+        @switch (shippingMethod) {
+          @case ('home') {
+            <div class="mt-3">
+              <nz-form-label>收件人姓名</nz-form-label>
+              <nz-form-control nzSpan="6">
+                <input nz-input />
+              </nz-form-control>
+              <nz-form-label>地址</nz-form-label>
+
+            </div>
+          }
+          @case ('711') {
+
+          }
+          @case ('fm') {
+
+          }
+          @case ('hilife') {
+
+          }
+        }
+      </div>
+    }
+    @case (2) {
+
+    }
+    @case (3) {
+      <nz-result
+        nzStatus="success"
+        nzTitle="訂單已成功送出！"
+        nzSubTitle="訂單編號：202508010001。"
+      >
+        <div nz-result-extra>
+          <button matButton routerLink="/orders">查看訂單</button>
+          <button matButton routerLink="/home">繼續購物</button>
+        </div>
+      </nz-result>
+    }
+  }
+</div>
+<div class="steps-action mt-4 text-end">
+  @if (current > 0) {
+    <button matButton (click)="prev()">
+      <span>上一步</span>
+    </button>
+  }
+  @if (current < 2) {
+    <button matButton (click)="next()">
+      <span>下一步</span>
+    </button>
+  }
+  @if (current === 2) {
+    <button matButton >
+      <span>完成訂單</span>
+    </button>
+  }
+</div>

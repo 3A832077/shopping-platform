@@ -175,4 +175,18 @@ export class SupabaseService {
     return this.supabase?.from('cart').update({ quantity }).eq('id', itemId);
   }
 
+  /**
+   * 訂單成立
+   */
+  createOrder(orderData: any) {
+    return this.supabase?.from('orders').insert(orderData);
+  }
+
+  /**
+   * 取得訂單列表
+   */
+  getOrders() {
+    return this.supabase?.from('orders').select('*').eq('member_id', this.userId$.getValue()).order('created_at', { ascending: false });
+  }
+
 }
