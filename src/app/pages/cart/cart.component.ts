@@ -107,7 +107,7 @@ export class CartComponent implements OnInit {
       nzCentered: true,
       nzMaskClosable: false,
       nzFooter: null,
-      nzWidth: '650px',
+      nzWidth: '600px',
       nzData: {
         cartItems: this.cartItems,
         total: this.sum

@@ -183,10 +183,47 @@ export class SupabaseService {
   }
 
   /**
-   * 取得訂單列表
+   * 取得所有訂單
    */
-  getOrders() {
-    return this.supabase?.from('orders').select('*').eq('member_id', this.userId$.getValue()).order('created_at', { ascending: false });
+  getOrders(page: number, limit: number) {
+    const from = (page - 1) * limit;
+    const to = from + limit - 1;
+    return this.supabase?.from('orders').select(`*,
+      order_items(order_id, name, quantity, pay, shipping)`,
+      { count: 'exact' }).order('update', { ascending: false }).order('id').range(from, to).
+      eq('member_id', this.userId$.getValue());
+  }
+  /**
+   * 取得縣市列表
+   */
+  getCities() {
+    return this.supabase?.from('city').select('*').order('id', { ascending: true });
+  }
+
+  /**
+   * 取得縣市下的區域列表
+   * @param cityId
+   */
+  getDistricts(cityId: number) {
+    return this.supabase?.from('area').select('*').eq('city_id', cityId).order('id', { ascending: true });
+  }
+
+  /**
+   * 取得711門市
+   * @param cityId
+   * @param areaId
+   */
+  getStores(cityId: number, areaId: number) {
+    return this.supabase?.from('store').select('*').eq('city_id', cityId).eq('area_id', areaId);
+  }
+
+  /**
+   * 更新訂單狀態
+   * @param orderId
+   * @param params
+   */
+  editOrder(orderId: string, params: any) {
+    return this.supabase?.from('orders').update(params).eq('id', orderId);
   }
 
 }

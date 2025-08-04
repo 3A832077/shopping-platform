@@ -1,4 +1,4 @@
-<nz-steps [nzCurrent]="current">
+<nz-steps [nzCurrent]="current" nzSize="small">
   <nz-step nzTitle="確認商品" nzDescription="檢查訂單內容"></nz-step>
   <nz-step nzTitle="寄送方式" nzDescription="選擇寄送方式"></nz-step>
   <nz-step nzTitle="付款方式" nzDescription="選擇付款方式"></nz-step>
@@ -42,38 +42,165 @@
         </nz-radio-group>
         @switch (shippingMethod) {
           @case ('home') {
-            <div class="mt-3">
-              <nz-form-label>收件人姓名</nz-form-label>
-              <nz-form-control nzSpan="6">
-                <input nz-input />
-              </nz-form-control>
-              <nz-form-label>地址</nz-form-label>
+            <div class="mt-4">
+              <form nz-form [formGroup]="form">
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <input formControlName="name" nz-input placeholder="請輸入姓名" />
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
 
+                  <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <nz-select nzPlaceHolder="選擇城市" (ngModelChange)="getArea($event)" formControlName="city" nzAllowClear nzShowSearch>
+                          @for (item of cities; track $index) {
+                            <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                          }
+                        </nz-select>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+
+                  <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <nz-select nzPlaceHolder="選擇區域" formControlName="area" nzAllowClear nzShowSearch>
+                          @for (item of areaList; track $index) {
+                            <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                          }
+                        </nz-select>
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-12">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <input formControlName="address" nz-input placeholder="請輸入詳細地址" />
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-6">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <input formControlName="phone" nz-input placeholder="請輸入聯絡電話" />
+                      </nz-form-control>
+                    </nz-form-item>
+                  </div>
+                </div>
+              </form>
             </div>
           }
           @case ('711') {
-
-          }
-          @case ('fm') {
-
-          }
-          @case ('hilife') {
-
+              <form [formGroup]="form">
+                <div class="row g-3 mt-2">
+                  <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <nz-select nzPlaceHolder="選擇城市" (ngModelChange)="getArea($event)" formControlName="city" nzAllowClear nzShowSearch>
+                          @for (item of cities; track $index) {
+                            <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                          }
+                        </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                  </div>
+                  <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <nz-select nzPlaceHolder="選擇區域" formControlName="area" nzAllowClear nzShowSearch
+                          (ngModelChange)="getStore(form.value.city, $event)">
+                        @for (item of areaList; track $index) {
+                          <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                        }
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+                <div class="col-12 col-md-4">
+                  <nz-form-item>
+                    <nz-form-control>
+                      <nz-select nzPlaceHolder="選擇取貨門市" formControlName="store" nzAllowClear nzShowSearch>
+                        @for (item of storeList; track $index) {
+                          <nz-option [nzValue]="item.id" [nzLabel]="item.name"></nz-option>
+                        }
+                      </nz-select>
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+              </div>
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-6">
+                  <nz-form-item>
+                    <nz-form-control>
+                      <input formControlName="name" nz-input placeholder="請輸入姓名" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+                <div class="col-12 col-md-6">
+                  <nz-form-item>
+                    <nz-form-control>
+                      <input formControlName="phone" nz-input placeholder="請輸入聯絡電話" />
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+              </div>
+            </form>
+            <div class="mt-3">
+              <p>門市地址: {{ storeList[getSelectedStoreIndex()]?.address || '--' }}</p>
+            </div>
           }
         }
       </div>
     }
     @case (2) {
-
+      <div class="col-12">
+        <p>請選擇您的付款方式：</p>
+        <nz-radio-group [(ngModel)]="payMethod">
+          <label nz-radio nzValue="credit">信用卡</label>
+          <label nz-radio nzValue="cash">貨到付款</label>
+        </nz-radio-group>
+        @if (payMethod === 'credit') {
+          <div class="mt-4">
+            <form nz-form [formGroup]="form">
+              <nz-form-item>
+                <nz-form-control>
+                  <input formControlName="cardNumber" nz-input placeholder="信用卡號" />
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-control>
+                  <input formControlName="cardHolder" nz-input placeholder="持卡人姓名" />
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-control>
+                  <input formControlName="expiryDate" nz-input placeholder="有效期限 (MM/YY)" />
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item>
+                <nz-form-control>
+                  <input formControlName="cvv" nz-input placeholder="CVV" />
+                </nz-form-control>
+              </nz-form-item>
+            </form>
+          </div>
+        }
+      </div>
     }
     @case (3) {
-      <nz-result
-        nzStatus="success"
-        nzTitle="訂單已成功送出！"
-        nzSubTitle="訂單編號：202508010001。"
-      >
+      <nz-result nzStatus="success" nzTitle="訂單已成功送出！">
         <div nz-result-extra>
-          <button matButton routerLink="/orders">查看訂單</button>
+          <button matButton routerLink="/order">查看訂單</button>
           <button matButton routerLink="/home">繼續購物</button>
         </div>
       </nz-result>
@@ -92,7 +219,7 @@
     </button>
   }
   @if (current === 2) {
-    <button matButton >
+    <button matButton (click)="next()">
       <span>完成訂單</span>
     </button>
   }
