@@ -60,6 +60,8 @@ export class ProductComponent implements OnInit {
 
   selectCategory: any;
 
+  total: number = 0;
+
   constructor(
                 private supabaseService: SupabaseService
              ) { }
@@ -97,7 +99,7 @@ export class ProductComponent implements OnInit {
     if (this.selectCategory.length === 0) {
       this.selectCategory = undefined;
     }
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory);
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
   }
 
   /**
@@ -107,12 +109,13 @@ export class ProductComponent implements OnInit {
    */
   getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number) {
     sort = this.selectSort === true ? true : false;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, error }) => {
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, count, error }) => {
       if (error) {
         console.error(error);
         return;
       }
       this.productsList = data || [];
+      this.total = count || 0;
     });
   }
 
@@ -126,7 +129,7 @@ export class ProductComponent implements OnInit {
         return;
       }
       this.categoryList = data || [];
-      this.getProducts();
+      this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
     });
   }
 
@@ -139,7 +142,7 @@ export class ProductComponent implements OnInit {
     this.minPrice = 0;
     this.maxPrice = 0;
     this.selectCategory = undefined;
-    this.getProducts();
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
   }
 
 

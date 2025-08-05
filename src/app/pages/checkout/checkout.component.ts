@@ -44,7 +44,7 @@ export class CheckoutComponent implements OnInit {
 
   data = inject(NZ_MODAL_DATA) || undefined;
 
-  shippingMethod: string = 'home';
+  shippingMethod: number = 1;
 
   cities: any[] = [];
 
@@ -54,7 +54,7 @@ export class CheckoutComponent implements OnInit {
 
   form: FormGroup = new FormGroup({});
 
-  payMethod: string = 'credit';
+  payMethod: number = 1;
 
   constructor(
     private supabaseService: SupabaseService,
@@ -89,14 +89,23 @@ export class CheckoutComponent implements OnInit {
     }
   }
 
+  /**
+   * 下一步
+   */
   next(): void {
     this.current += 1;
   }
 
+  /**
+   * 返回上一步
+   */
   prev(): void {
     this.current -= 1;
   }
 
+  /**
+   * 取得縣市
+   */
   getCity(){
     this.supabaseService.getCities()?.then(({data, error}) => {
       if (error) {
@@ -112,6 +121,10 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  /**
+   * 取得區域
+   * @param cityId
+   */
   getArea(cityId: any) {
     this.form.patchValue({ area: null });
     this.areaList = [];
@@ -129,6 +142,11 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  /**
+   * 取得711門市
+   * @param cityId
+   * @param areaId
+   */
   getStore(cityId: any, areaId: any) {
     this.form.patchValue({ store: null });
     this.storeList = [];
@@ -146,10 +164,23 @@ export class CheckoutComponent implements OnInit {
     });
   }
 
+  /**
+   * 取得選擇的711門市index
+   * @returns
+   */
   getSelectedStoreIndex(): number {
     return this.storeList.findIndex(store => store.id === this.form.value.store);
   }
 
+  /**
+   * 建立訂單
+   */
+  createOrder() {
+    const params: any = {
+      
+    }
+
+  }
 
 
 

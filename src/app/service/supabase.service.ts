@@ -98,6 +98,8 @@ export class SupabaseService {
     return this.supabase?.from('categories').select('*').order('id', { ascending: true });
   }
 
+
+
   /**
    * 取得產品列表
    * @param page
@@ -106,11 +108,15 @@ export class SupabaseService {
   getProducts(page: number = 1, limit: number = 10, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    let query = this.supabase?.from('products').select('*', { count: 'exact' });
+    let query = this.supabase?.from('products').select('*', { count: 'exact' }).eq('status', true);
 
     if (Array.isArray(category) && category.length > 0) {
       query = query?.in('category', category);
     }
+    else if (category !== undefined && category !== null) {
+      query = query?.eq('category', category);
+    }
+
     if (minPrice !== undefined && minPrice !== null) {
       query = query?.gte('price', minPrice);
     }
@@ -176,7 +182,7 @@ export class SupabaseService {
   }
 
   /**
-   * 訂單成立
+   *
    */
   createOrder(orderData: any) {
     return this.supabase?.from('orders').insert(orderData);

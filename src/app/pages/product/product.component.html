@@ -9,7 +9,7 @@
     <div class="col-6 text-end">
       <p class="mb-0">排序依據
         <nz-select [(ngModel)]="selectSort"
-          (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, minPrice, maxPrice)"
+          (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, selectCategory, minPrice, maxPrice)"
           [nzBorderless]="true" ngSkipHydration>
           <nz-option [nzValue]="false" nzLabel="預設"></nz-option>
           <nz-option [nzValue]="true" nzLabel="最舊"></nz-option>
@@ -33,7 +33,8 @@
           </div>
 
           <div *ngIf="categoryIsExpanded" class="filter-content">
-            <label nz-checkbox *ngFor="let item of categoryList" [(ngModel)]="item.checked" (ngModelChange)="onCheckboxChange()">
+            <label nz-checkbox *ngFor="let item of categoryList" [(ngModel)]="item.checked"
+              (ngModelChange)="onCheckboxChange()">
               {{ item.name }}
             </label>
           </div>
@@ -69,7 +70,7 @@
         <p class="mb-0">
           排序依據
           <nz-select [(ngModel)]="selectSort" [nzBorderless]="true" ngSkipHydration
-            (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, minPrice, maxPrice)">
+            (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, selectCategory, minPrice, maxPrice)">
             <nz-option [nzValue]="false" nzLabel="預設"></nz-option>
             <nz-option [nzValue]="true" nzLabel="最舊"></nz-option>
           </nz-select>
@@ -87,12 +88,15 @@
           </div>
         }
         <div class="col-12 d-flex justify-content-end">
-          <nz-pagination [nzPageSize]="pageSize" [nzPageIndex]="pageIndex" [nzTotal]="productsList.length"
-            [nzShowSizeChanger]="true" [nzPageSizeOptions]="[10, 20, 30, 40, 50]"
+          <nz-pagination [nzPageSize]="pageSize" [nzPageIndex]="pageIndex" [nzShowTotal]="totalTemplate"
+            nzShowSizeChanger=true [nzPageSizeOptions]="[10, 20, 30, 40, 50]" [nzTotal]="total"
             (nzPageIndexChange)="getProducts($event, pageSize, selectSort, selectCategory, minPrice, maxPrice)"
             (nzPageSizeChange)="getProducts(pageIndex, $event, selectSort, selectCategory, minPrice, maxPrice)">
           </nz-pagination>
         </div>
+        <ng-template #totalTemplate>
+          總共 {{ total }} 筆
+        </ng-template>
       </div>
     </div>
   </div>

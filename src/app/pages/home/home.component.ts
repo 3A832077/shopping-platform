@@ -52,7 +52,7 @@ export class HomeComponent implements OnInit {
    * 取得產品列表
    */
   getProoducts(){
-    this.supabaseService?.getProducts(1, 5)?.then(({ data, error }) => {
+    this.supabaseService?.getProducts(1, 4)?.then(({ data, error }) => {
       if (error) {
         console.error(error);
         return;

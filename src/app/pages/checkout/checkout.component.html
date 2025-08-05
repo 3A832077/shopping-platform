@@ -37,11 +37,11 @@
       <div class="col-12">
         <p>請選擇您的寄送方式：</p>
         <nz-radio-group [(ngModel)]="shippingMethod">
-          <label nz-radio nzValue="home">宅配</label>
-          <label nz-radio nzValue="711">7-11取貨</label>
+          <label nz-radio nzValue="1">宅配</label>
+          <label nz-radio nzValue="2">7-11取貨</label>
         </nz-radio-group>
         @switch (shippingMethod) {
-          @case ('home') {
+          @case (1) {
             <div class="mt-4">
               <form nz-form [formGroup]="form">
                 <div class="row g-3 mb-3">
@@ -100,7 +100,7 @@
               </form>
             </div>
           }
-          @case ('711') {
+          @case (2) {
               <form [formGroup]="form">
                 <div class="row g-3 mt-2">
                   <div class="col-12 col-md-4">
@@ -166,10 +166,10 @@
       <div class="col-12">
         <p>請選擇您的付款方式：</p>
         <nz-radio-group [(ngModel)]="payMethod">
-          <label nz-radio nzValue="credit">信用卡</label>
-          <label nz-radio nzValue="cash">貨到付款</label>
+          <label nz-radio nzValue="1">信用卡</label>
+          <label nz-radio nzValue="2">貨到付款</label>
         </nz-radio-group>
-        @if (payMethod === 'credit') {
+        @if (payMethod === 1) {
           <div class="mt-4">
             <form nz-form [formGroup]="form">
               <nz-form-item>

@@ -58,6 +58,8 @@ export class CategoryComponent implements OnInit {
 
   maxPrice: number = 0;
 
+  total: number = 0;
+
   constructor(
                 private supabaseService: SupabaseService,
                 private router: Router
@@ -77,7 +79,7 @@ export class CategoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getCategory();
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice);
     this.onResize();
   }
 
@@ -88,32 +90,18 @@ export class CategoryComponent implements OnInit {
     this.filterOpen = !this.filterOpen;
   }
 
-   /**
-   * 取得該類別所有商品
-   * @param id
-   */
-  getCategory(){
-    this.supabaseService?.getRelatedProducts(this.id)?.then(({ data, error }) => {
-      if (error) {
-        console.error(error);
-        return;
-      }
-      this.productsList = data || [];
-      this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.minPrice, this.maxPrice);
-    });
-  }
-
   /**
    * 取得產品列表
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, minPrice?: number, maxPrice?: number) {
+  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, category?: number, minPrice?: number, maxPrice?: number) {
     sort = this.selectSort === false ? false : true;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, minPrice, maxPrice)?.then(({ data, error }) => {
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, error, count }) => {
       if (error) {
         console.error(error);
         return;
       }
       this.productsList = data || [];
+      this.total = count || 0;
     });
   }
 
@@ -126,7 +114,7 @@ export class CategoryComponent implements OnInit {
     this.selectSort = false;
     this.minPrice = 0;
     this.maxPrice = 0;
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.minPrice, this.maxPrice);
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice);
   }
 
   /**
