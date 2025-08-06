@@ -22,3 +22,9 @@ nz-page-header {
   font-weight: 700;
   padding-left: 25px;
 }
+
+.sold-out {
+  color: #d32f2f;
+  font-size: 1rem;
+  font-weight: bold;
+}

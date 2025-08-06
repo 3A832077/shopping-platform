@@ -72,7 +72,7 @@
         }
         <div class="col-12 d-flex justify-content-end">
           <nz-pagination [nzPageSize]="pageSize" [nzPageIndex]="pageIndex" [nzTotal]="total"
-            [nzShowSizeChanger]="true" [nzPageSizeOptions]="[10, 20, 30, 40, 50]" [nzShowTotal]="totalTemplate"
+            [nzShowSizeChanger]="true" [nzPageSizeOptions]="[12, 24, 36, 48]" [nzShowTotal]="totalTemplate"
             (nzPageIndexChange)="getProducts($event, pageSize, selectSort, id, minPrice, maxPrice)"
             (nzPageSizeChange)="getProducts(pageIndex, $event, selectSort, id, minPrice, maxPrice)">
           </nz-pagination>

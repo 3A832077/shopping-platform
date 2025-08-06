@@ -83,13 +83,20 @@
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
               </div>
               <div>{{ product.name }}</div>
-              <div>${{ product.price }}</div>
+              <div>
+                @if (product.stock === 0) {
+                  <span class="sold-out">已售完</span>
+                }
+                @else {
+                  <span>${{ product.price }}</span>
+                }
+              </div>
             </div>
           </div>
         }
         <div class="col-12 d-flex justify-content-end">
           <nz-pagination [nzPageSize]="pageSize" [nzPageIndex]="pageIndex" [nzShowTotal]="totalTemplate"
-            nzShowSizeChanger=true [nzPageSizeOptions]="[10, 20, 30, 40, 50]" [nzTotal]="total"
+            nzShowSizeChanger=true [nzPageSizeOptions]="[12, 24, 36, 48]" [nzTotal]="total"
             (nzPageIndexChange)="getProducts($event, pageSize, selectSort, selectCategory, minPrice, maxPrice)"
             (nzPageSizeChange)="getProducts(pageIndex, $event, selectSort, selectCategory, minPrice, maxPrice)">
           </nz-pagination>

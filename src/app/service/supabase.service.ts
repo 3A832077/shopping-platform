@@ -105,7 +105,7 @@ export class SupabaseService {
    * @param page
    * @param limit
    */
-  getProducts(page: number = 1, limit: number = 10, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number) {
+  getProducts(page: number = 1, limit: number = 12, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     let query = this.supabase?.from('products').select('*', { count: 'exact' }).eq('status', true);
@@ -182,10 +182,29 @@ export class SupabaseService {
   }
 
   /**
-   *
+   * 建立訂單
+   * @param orderData
    */
   createOrder(orderData: any) {
     return this.supabase?.from('orders').insert(orderData);
+  }
+
+  /**
+   * 建立訂單商品
+   * @param orderItemData
+   */
+  createOrderItem(orderItemData: any) {
+    return this.supabase?.from('order_items').insert(orderItemData);
+  }
+
+  /**
+   * 商品庫存扣掉訂單數量
+   */
+  async updateProductStock(productId: number, quantity: number) {
+    const response = await this.supabase?.from('products').select('stock').eq('id', productId).single();
+    if (response && response.data && response.data.stock) {
+      await this.supabase?.from('products').update({ stock: response.data.stock - quantity }).eq('id', productId);
+    }
   }
 
   /**

@@ -7,10 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
-import { NzFormItemComponent } from "ng-zorro-antd/form";
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { CheckoutComponent } from '../checkout/checkout.component';
+import { CommonModule } from '@angular/common';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 @Component({
   selector: 'app-cart',
@@ -21,8 +22,9 @@ import { CheckoutComponent } from '../checkout/checkout.component';
     NzInputNumberModule,
     FormsModule,
     ReactiveFormsModule,
-    NzFormItemComponent,
-    NzModalModule
+    NzModalModule,
+    CommonModule,
+    NzDividerModule
 ],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.css'
@@ -78,6 +80,7 @@ export class CartComponent implements OnInit {
         console.error(error);
       }
       else {
+        this.messageService.success('商品已移除');
         this.getCartItems();
       }
     });

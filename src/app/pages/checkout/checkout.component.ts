@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -71,16 +71,11 @@ export class CheckoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      name: [''],
-      city: [null],
-      area: [null],
-      store: [null],
-      address: [''],
-      phone: [''],
-      cardNumber: [''],
-      cardHolder: [''],
-      expiryDate: [''],
-      cvv: ['']
+      name: ['', Validators.required],
+      city: [null, Validators.required],
+      area: [null, Validators.required],
+      address: ['', Validators.required],
+      phone: ['', Validators.required],
     });
     this.getCity();
     if (this.data) {
@@ -93,7 +88,21 @@ export class CheckoutComponent implements OnInit {
    * 下一步
    */
   next(): void {
+    if (this.current === 1 || this.current === 2) {
+      if (this.form.invalid) {
+        Object.values(this.form.controls).forEach(control => {
+          if (control.invalid) {
+            control.markAsDirty();
+            control.updateValueAndValidity({ onlySelf: true });
+          }
+        });
+        return;
+      }
+    }
     this.current += 1;
+    if (this.current === 3) {
+      this.createOrder();
+    }
   }
 
   /**
@@ -159,7 +168,6 @@ export class CheckoutComponent implements OnInit {
         if (this.storeList.length > 0) {
           this.form.patchValue({ store: this.storeList[0].id });
         }
-
       }
     });
   }
@@ -176,12 +184,81 @@ export class CheckoutComponent implements OnInit {
    * 建立訂單
    */
   createOrder() {
-    const params: any = {
-      
+    const sumPrice = this.cartItems.reduce((acc, item) => {
+      return acc + (item.products.price * item.quantity) + (this.shippingMethod === 1 ? 70 : 60);
+    }, 0);
+    const orders: any = {
+      member_id: this.supabaseService.userId$.getValue(),
+      date: new Date().toISOString(),
+      update: new Date().toISOString(),
+      status: 0,
+      total: sumPrice
     }
-
+    const orderItems: any = {
+      name: this.form.value.name,
+      city: this.form.value.city,
+      area: this.form.value.area,
+      store: this.form.value.store,
+      address: this.form.value.address,
+      phone: this.form.value.phone,
+      pay: this.payMethod,
+      shipping: this.shippingMethod,
+    };
+    this.supabaseService.createOrder(orders)?.then(({ data, error }: { data: { id: number }[] | null, error: any }) => {
+      if (error) {
+        console.error(error);
+      }
+      else {
+        this.cartItems.forEach(item => {
+          orderItems['product_id'] = item.product_id;
+          orderItems['quantity'] = item.quantity;
+          orderItems['price'] = item.products.price;
+          if (data && data[0]) {
+            orderItems['order_id'] = data[0].id;
+          }
+        });
+        this.supabaseService.createOrderItem(orderItems)?.then(({ data, error }) => {
+          if (error) {
+            console.error(error);
+          }
+          else {
+            this.cartItems.forEach(item => {
+              this.supabaseService.updateProductStock(item.id, item.quantity);
+            });
+          }
+        });
+      }
+    });
   }
 
+  /**
+   * 運送方式變動
+   */
+  onShippingMethodChange() {
+    if (this.shippingMethod === 2) {
+      this.form.addControl('store', this.fb.control(null, Validators.required));
+    }
+    else {
+      this.form.removeControl('store');
+    }
+  }
 
+  /**
+   * 付款方式變動
+   */
+  onPayMethodChange() {
+    if (this.payMethod === 1) {
+      this.form.addControl('cardNumber', this.fb.control('', Validators.required));
+      this.form.addControl('cardHolder', this.fb.control('', Validators.required));
+      this.form.addControl('expiryDate', this.fb.control('', Validators.required));
+      this.form.addControl('csv', this.fb.control('', Validators.required));
+    }
+    else {
+      ['cardNumber', 'cardHolder', 'expiryDate', 'csv'].forEach(ctrl => {
+        this.form.removeControl(ctrl);
+      });
+    }
+  }
 
 }
+

@@ -38,7 +38,7 @@ export class ProductComponent implements OnInit {
 
   pageIndex: number = 1;
 
-  pageSize: number = 10;
+  pageSize: number = 12;
 
   categoryList: any[] = [];
 
@@ -107,7 +107,7 @@ export class ProductComponent implements OnInit {
    * @param pageIndex
    * @param pageSize
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number) {
+  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number) {
     sort = this.selectSort === true ? true : false;
     this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, count, error }) => {
       if (error) {

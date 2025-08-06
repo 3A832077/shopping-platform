@@ -42,7 +42,7 @@ export class CategoryComponent implements OnInit {
 
   pageIndex: number = 1;
 
-  pageSize: number = 10;
+  pageSize: number = 12;
 
   selectedSort = 'default';
 
@@ -93,7 +93,7 @@ export class CategoryComponent implements OnInit {
   /**
    * 取得產品列表
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 10, sort: boolean = true, category?: number, minPrice?: number, maxPrice?: number) {
+  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: number, minPrice?: number, maxPrice?: number) {
     sort = this.selectSort === false ? false : true;
     this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, error, count }) => {
       if (error) {
@@ -110,7 +110,7 @@ export class CategoryComponent implements OnInit {
    */
   resetFilter() {
     this.pageIndex = 1;
-    this.pageSize = 10;
+    this.pageSize = 12;
     this.selectSort = false;
     this.minPrice = 0;
     this.maxPrice = 0;
