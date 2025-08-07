@@ -14,6 +14,9 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzPageHeaderModule } from "ng-zorro-antd/page-header";
 import { CommonModule } from '@angular/common';
 import { Router, NavigationStart } from '@angular/router';
+import { checkCardNumberValidator } from '../../validator/checkCradNumber';
+import { checkExpireDateValidator } from '../../validator/checkExpireDate';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 @Component({
   selector: 'app-checkout',
@@ -29,7 +32,8 @@ import { Router, NavigationStart } from '@angular/router';
     NzSelectModule,
     NzFormModule,
     NzPageHeaderModule,
-    CommonModule
+    CommonModule,
+    NzDatePickerModule
 ],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.css'
@@ -56,6 +60,10 @@ export class CheckoutComponent implements OnInit {
 
   payMethod: number = 1;
 
+  disabled: boolean = false;
+
+  cardTypeImg: string | null = null;
+
   constructor(
     private supabaseService: SupabaseService,
     private fb: FormBuilder,
@@ -76,6 +84,10 @@ export class CheckoutComponent implements OnInit {
       area: [null, Validators.required],
       address: ['', Validators.required],
       phone: ['', Validators.required],
+      cardNumber: ['', [checkCardNumberValidator]],
+      expiryDate: [null, [checkExpireDateValidator]],
+      csv: ['', [Validators.pattern('^\\d{3}$'), Validators.required]],
+      cardHolder: ['', Validators.required],
     });
     this.getCity();
     if (this.data) {
@@ -85,19 +97,51 @@ export class CheckoutComponent implements OnInit {
   }
 
   /**
+   * 檢查各步驟表單必填
+   * @returns
+   */
+  checkStepValid(): boolean {
+    if (this.current === 1) {
+      const { name, phone, address, store } = this.form.value;
+      // 若姓名和電話都沒填
+      if (!name && !phone) {
+        // 宅配需填地址
+        if (this.shippingMethod === 1 && !address) {
+          return false;
+        }
+        // 超商需選門市
+        if (this.shippingMethod === 2 && !store) {
+          return false;
+        }
+      }
+      else{
+        if (this.shippingMethod === 2 && !store) {
+          return false;
+        }
+      }
+    }
+    else if (this.current === 2 && this.payMethod === 1) {
+      // 信用卡付款需填完整資訊
+      const { cardNumber, cardHolder, expiryDate, csv } = this.form.value;
+      if (!cardNumber || !cardHolder || !expiryDate || !csv) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
    * 下一步
    */
   next(): void {
-    if (this.current === 1 || this.current === 2) {
-      if (this.form.invalid) {
-        Object.values(this.form.controls).forEach(control => {
-          if (control.invalid) {
-            control.markAsDirty();
-            control.updateValueAndValidity({ onlySelf: true });
-          }
-        });
-        return;
-      }
+    if (!this.checkStepValid()) {
+      Object.values(this.form.controls).forEach(control => {
+        if (control.invalid) {
+          control.markAsDirty();
+          control.updateValueAndValidity({ onlySelf: true });
+        }
+      });
+      return;
     }
     this.current += 1;
     if (this.current === 3) {
@@ -193,37 +237,38 @@ export class CheckoutComponent implements OnInit {
       update: new Date().toISOString(),
       status: 0,
       total: sumPrice
-    }
-    const orderItems: any = {
-      name: this.form.value.name,
-      city: this.form.value.city,
-      area: this.form.value.area,
-      store: this.form.value.store,
-      address: this.form.value.address,
-      phone: this.form.value.phone,
-      pay: this.payMethod,
-      shipping: this.shippingMethod,
     };
-    this.supabaseService.createOrder(orders)?.then(({ data, error }: { data: { id: number }[] | null, error: any }) => {
+
+    this.supabaseService.createOrder(orders)?.then(({ data, error }) => {
       if (error) {
         console.error(error);
       }
       else {
-        this.cartItems.forEach(item => {
-          orderItems['product_id'] = item.product_id;
-          orderItems['quantity'] = item.quantity;
-          orderItems['price'] = item.products.price;
-          if (data && data[0]) {
-            orderItems['order_id'] = data[0].id;
-          }
-        });
+        // 建立 orderItems 陣列
+        const orderItems: any[] = this.cartItems.map(item => ({
+          name: this.form.value.name,
+          city: this.form.value.city,
+          area: this.form.value.area,
+          store: this.form.value.store,
+          address: this.form.value.address,
+          phone: this.form.value.phone,
+          pay: this.payMethod,
+          shipping: this.shippingMethod,
+          products_id: item.product_id,
+          quantity: item.quantity,
+          price: item.products.price,
+          orders_id: data?.id
+        }));
+
+        // 批次建立訂單明細
         this.supabaseService.createOrderItem(orderItems)?.then(({ data, error }) => {
           if (error) {
             console.error(error);
           }
           else {
             this.cartItems.forEach(item => {
-              this.supabaseService.updateProductStock(item.id, item.quantity);
+              this.supabaseService.updateProductStock(item.products.id, item.quantity);
+              this.supabaseService.removeCartItem(item.id);
             });
           }
         });
@@ -244,20 +289,19 @@ export class CheckoutComponent implements OnInit {
   }
 
   /**
-   * 付款方式變動
+   * 判斷信用卡號類別
+   * @param event
    */
-  onPayMethodChange() {
-    if (this.payMethod === 1) {
-      this.form.addControl('cardNumber', this.fb.control('', Validators.required));
-      this.form.addControl('cardHolder', this.fb.control('', Validators.required));
-      this.form.addControl('expiryDate', this.fb.control('', Validators.required));
-      this.form.addControl('csv', this.fb.control('', Validators.required));
+  checkCardType(event: any): void {
+    if (!event) {
+      this.cardTypeImg = null;
+      return;
     }
-    else {
-      ['cardNumber', 'cardHolder', 'expiryDate', 'csv'].forEach(ctrl => {
-        this.form.removeControl(ctrl);
-      });
-    }
+    const n = event.replace(/\D/g, '');
+    if (/^4/.test(n)) this.cardTypeImg = '/img/visa.png';
+    else if (/^5[1-5]/.test(n)) this.cardTypeImg = '/img/mastercard.png';
+    else if (/^3[47]/.test(n)) this.cardTypeImg = '/img/amex.png';
+    else if (/^35/.test(n)) this.cardTypeImg = '/img/JCB.png';
   }
 
 }

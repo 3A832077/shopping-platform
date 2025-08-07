@@ -186,7 +186,7 @@ export class SupabaseService {
    * @param orderData
    */
   createOrder(orderData: any) {
-    return this.supabase?.from('orders').insert(orderData);
+    return this.supabase?.from('orders').insert(orderData).select('id').single();
   }
 
   /**
@@ -214,7 +214,7 @@ export class SupabaseService {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     return this.supabase?.from('orders').select(`*,
-      order_items(order_id, name, quantity, pay, shipping)`,
+      order_items(orders_id, name, quantity, pay, shipping)`,
       { count: 'exact' }).order('update', { ascending: false }).order('id').range(from, to).
       eq('member_id', this.userId$.getValue());
   }

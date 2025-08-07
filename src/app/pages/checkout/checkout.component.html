@@ -74,20 +74,42 @@
                       </nz-form-control>
                     </nz-form-item>
                   </div>
+                   <div class="col-12 col-md-4">
+                    <nz-form-item>
+                      <nz-form-control>
+                        <input formControlName="name" nz-input placeholder="請輸入姓名" />
+                      </nz-form-control>
+                      @if (form.get('name')?.errors?.['required']) {
+                        <div style="display: flex; align-items: center;">
+                          <span style="color:red;margin-left: 5px;">姓名為必填</span>
+                        </div>
+                      }
+                    </nz-form-item>
+                  </div>
                 </div>
                 <div class="row g-3 mb-3">
                   <div class="col-12 col-md-6">
                     <nz-form-item>
                       <nz-form-control>
-                        <input formControlName="name" nz-input placeholder="請輸入姓名" />
+                        <input formControlName="phone" nz-input placeholder="請輸入聯絡電話" />
                       </nz-form-control>
+                      @if (form.get('phone')?.errors?.['required']) {
+                        <div style="display: flex; align-items: center;">
+                          <span style="color:red;margin-left: 5px;">電話為必填</span>
+                        </div>
+                      }
                     </nz-form-item>
                   </div>
                   <div class="col-12 col-md-6">
                     <nz-form-item>
                       <nz-form-control>
-                        <input formControlName="phone" nz-input placeholder="請輸入聯絡電話" />
+                        <input formControlName="address" nz-input placeholder="請輸入地址" />
                       </nz-form-control>
+                      @if (form.get('address')?.errors?.['required']) {
+                        <div style="display: flex; align-items: center;">
+                          <span style="color:red;margin-left: 5px;">地址為必填</span>
+                        </div>
+                      }
                     </nz-form-item>
                   </div>
                 </div>
@@ -128,6 +150,11 @@
                           }
                         </nz-select>
                       </nz-form-control>
+                      @if (form.get('store')?.errors?.['required']) {
+                        <div style="display: flex; align-items: center;margin-top: 5px;">
+                          <span style="color:red;">取貨門市為必填</span>
+                        </div>
+                      }
                     </nz-form-item>
                   </div>
                 </div>
@@ -137,6 +164,11 @@
                       <nz-form-control>
                         <input formControlName="name" nz-input placeholder="請輸入姓名" />
                       </nz-form-control>
+                      @if (form.get('name')?.errors?.['required']) {
+                        <div style="display: flex; align-items: center;margin-top: 5px;">
+                            <span style="color:red;">姓名為必填</span>
+                        </div>
+                      }
                     </nz-form-item>
                   </div>
                   <div class="col-12 col-md-6">
@@ -144,12 +176,17 @@
                       <nz-form-control>
                         <input formControlName="phone" nz-input placeholder="請輸入聯絡電話" />
                       </nz-form-control>
+                      @if (form.get('phone')?.errors?.['required']) {
+                      <div style="display: flex; align-items: center;margin-top: 5px;">
+                        <span style="color:red;">電話為必填</span>
+                      </div>
+                      }
                     </nz-form-item>
                   </div>
                 </div>
               </form>
-              <div class="mt-3">
-                <p>門市地址: {{ storeList[getSelectedStoreIndex()]?.address || '--' }}</p>
+              <div>
+                門市地址: {{ storeList[getSelectedStoreIndex()]?.address || '--' }}
               </div>
             }
           }
@@ -158,33 +195,91 @@
     }
     @case (2) {
       <div class="col-12">
-        <nz-radio-group [(ngModel)]="payMethod" (ngModelChange)="onPayMethodChange()">
+        <nz-radio-group [(ngModel)]="payMethod">
           <label nz-radio [nzValue]="1">信用卡</label>
           <label nz-radio [nzValue]="2">貨到付款</label>
         </nz-radio-group>
         <div class="mt-4">
           @if (payMethod === 1) {
             <form nz-form [formGroup]="form">
-              <nz-form-item>
-                <nz-form-control>
-                  <input formControlName="cardNumber" nz-input placeholder="信用卡號" />
-                </nz-form-control>
-              </nz-form-item>
-              <nz-form-item>
-                <nz-form-control>
-                  <input formControlName="cardHolder" nz-input placeholder="持卡人姓名" />
-                </nz-form-control>
-              </nz-form-item>
-              <nz-form-item>
-                <nz-form-control>
-                  <input formControlName="expiryDate" nz-input placeholder="有效期限 (MM/YY)" />
-                </nz-form-control>
-              </nz-form-item>
-              <nz-form-item>
-                <nz-form-control>
-                  <input formControlName="csv" nz-input placeholder="安全碼" />
-                </nz-form-control>
-              </nz-form-item>
+               <div nz-col nzSpan="24" class="pb-10">
+                <nz-form-item>
+                  <nz-form-label [nzSpan]="4">持卡人姓名</nz-form-label>
+                  <nz-form-control [nzSpan]="11">
+                    <input nz-input formControlName="cardHolder" placeholder="請輸入持卡人姓名"/>
+                  </nz-form-control>
+                  @if (form.get('cardHolder')?.errors?.['required']) {
+                    <div style="display: flex; align-items: center;margin-left: 5px;">
+                      <span style="color:red;">持卡人姓名為必填</span>
+                    </div>
+                  }
+                </nz-form-item>
+              </div>
+              <div nz-col nzSpan="16">
+                <nz-form-item>
+                  <nz-form-label [nzSpan]="6">信用卡號</nz-form-label>
+                  <nz-form-control [nzSpan]="17">
+                    <input nz-input formControlName="cardNumber" maxlength="16"
+                      autocomplete="cc-number" (ngModelChange)="checkCardType($event)"/>
+                    @if (form.get('cardNumber')?.errors?.['required']) {
+                      <div style="margin-top: 5px;">
+                        <span style="color:red;">信用卡號為必填</span>
+                      </div>
+                    }
+                    @if (form.get('cardNumber')?.errors?.['invalidCardNumber']) {
+                      <div style="margin-top: 5px;">
+                        <span style="color:red;">無效的信用卡號</span>
+                      </div>
+                    }
+                  </nz-form-control>
+                  <div nz-col nzSpan="2">
+                    @if (cardTypeImg) {
+                      <img [src]="cardTypeImg" height="32px"/>
+                    }
+                  </div>
+                </nz-form-item>
+              </div>
+
+              <div nz-row nzGutter="8">
+                <div nz-col nzSpan="12">
+                  <nz-form-item>
+                    <nz-form-label [nzSpan]="8">到期日</nz-form-label>
+                    <nz-form-control [nzSpan]="12">
+                      <nz-date-picker formControlName="expiryDate" nzFormat="MM/yyyy"
+                        nzMode="month" nzPlaceHolder="請選擇到期日">
+                      </nz-date-picker>
+                      @if (form.get('expiryDate')?.errors?.['required']) {
+                        <div style="margin-top: 5px;">
+                          <span style="color:red;">到期日為必填</span>
+                        </div>
+                      }
+                      @if (form.get('expiryDate')?.errors?.['expired']) {
+                        <div style="margin-top: 5px;">
+                          <span style="color:red;">這張卡已過期</span>
+                        </div>
+                      }
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+                <div nz-col nzSpan="12">
+                  <nz-form-item>
+                    <nz-form-label [nzSpan]="4">安全碼</nz-form-label>
+                    <nz-form-control [nzSpan]="11">
+                      <input nz-input formControlName="csv" maxlength="3" style="width: 80px" autocomplete="cc-csc"/>
+                      @if (form.get('csv')?.errors?.['required']) {
+                        <div style="margin-top: 5px;">
+                          <span style="color:red;">安全碼為必填</span>
+                        </div>
+                      }
+                      @if (form.get('csv')?.errors?.['pattern']) {
+                        <div style="margin-top: 5px;">
+                          <span style="color:red;">無效的安全碼</span>
+                        </div>
+                      }
+                    </nz-form-control>
+                  </nz-form-item>
+                </div>
+              </div>
             </form>
           }
         </div>
@@ -201,7 +296,7 @@
   }
 </div>
 <div class="steps-action mt-4 text-end">
-  @if (current > 0) {
+  @if (current > 0 && current !== 3) {
     <button matButton (click)="prev()">
       <span>上一步</span>
     </button>
