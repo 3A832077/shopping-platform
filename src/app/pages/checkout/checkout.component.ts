@@ -17,6 +17,8 @@ import { Router, NavigationStart } from '@angular/router';
 import { checkCardNumberValidator } from '../../validator/checkCradNumber';
 import { checkExpireDateValidator } from '../../validator/checkExpireDate';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { forkJoin, of } from 'rxjs';
+import { CartComponent } from '../cart/cart.component';
 
 @Component({
   selector: 'app-checkout',
@@ -68,7 +70,7 @@ export class CheckoutComponent implements OnInit {
     private supabaseService: SupabaseService,
     private fb: FormBuilder,
     private router: Router,
-    private modalRef: NzModalRef
+    private modalRef: NzModalRef,
   ) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationStart) {
@@ -266,10 +268,24 @@ export class CheckoutComponent implements OnInit {
             console.error(error);
           }
           else {
-            this.cartItems.forEach(item => {
-              this.supabaseService.updateProductStock(item.products.id, item.quantity);
-              this.supabaseService.removeCartItem(item.id);
+            // 用 forkJoin 等所有刪除完成
+            const removeObservables = this.cartItems.map(item =>
+              this.supabaseService.removeCartItem(item.id) || of(null)
+            );
+            forkJoin(removeObservables).subscribe({
+              next: () => {
+                this.cartItems = [];
+                this.supabaseService.fetchCartItems();
+              },
+              error: err => {
+                console.error('刪除購物車失敗', err);
+              }
             });
+
+            const updateObservables = this.cartItems.map(item =>
+              this.supabaseService.updateProductStock(item.products.id, item.quantity) || of(null)
+            );
+            forkJoin(updateObservables).subscribe();
           }
         });
       }

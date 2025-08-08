@@ -31,15 +31,17 @@
             <i nz-icon [nzType]="priceIsExpanded ? 'minus' : 'plus'"></i>
           </div>
 
-          <div *ngIf="priceIsExpanded" class="filter-content">
-            <div class="d-flex align-items-center">
-              <nz-input-number class="me-2" [(ngModel)]="minPrice" [nzMin]="0"></nz-input-number>
-              <span class="mx-1">-</span>
-              <nz-input-number class="ms-2" [(ngModel)]="maxPrice" [nzMin]="0"
-                (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, id, minPrice, maxPrice)">
-              </nz-input-number>
+          @if (priceIsExpanded){
+            <div class="filter-content">
+              <div class="d-flex align-items-center">
+                <nz-input-number class="me-2" [(ngModel)]="minPrice" [nzMin]="0"></nz-input-number>
+                <span class="mx-1">-</span>
+                <nz-input-number class="ms-2" [(ngModel)]="maxPrice" [nzMin]="0"
+                  (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, id, minPrice, maxPrice)">
+                </nz-input-number>
+              </div>
             </div>
-          </div>
+          }
         </div>
 
         <nz-divider />
@@ -66,7 +68,12 @@
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
               </div>
               <div>{{ product.name }}</div>
-              <div>${{ product.price }}</div>
+              @if (product.stock === 0) {
+                <span class="sold-out">已售完</span>
+              }
+              @else {
+                <span>${{ product.price }}</span>
+              }
             </div>
           </div>
         }

@@ -15,6 +15,8 @@ export class SupabaseService {
 
   email$ = new BehaviorSubject<string | null>(null);
 
+  cartItems$ = new BehaviorSubject<any[]>([]);
+
   constructor() {
     this.createClient();
     this.loginState();
@@ -98,8 +100,6 @@ export class SupabaseService {
     return this.supabase?.from('categories').select('*').order('id', { ascending: true });
   }
 
-
-
   /**
    * 取得產品列表
    * @param page
@@ -149,6 +149,17 @@ export class SupabaseService {
   getCartItems() {
     return this.supabase?.from('cart').select(`id, product_id, quantity,
       products (id, name, price, imageUrl, stock)`).eq('user_id', this.userId$.getValue());
+  }
+
+  /**
+   * 用BehaviorSubject 管理購物車資料
+   */
+  fetchCartItems() {
+    this.getCartItems()?.then(({ data, error }) => {
+      if (!error) {
+        this.cartItems$.next(data || []);
+      }
+    });
   }
 
   /**

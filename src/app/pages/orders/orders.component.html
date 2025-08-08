@@ -34,7 +34,7 @@
                 <button nz-button nzType="link" (click)="updateOrders(order.id, 5, 'status')">完成訂單</button>
               }
             </td>
-            <td>${{ order.price }}</td>
+            <td>${{ order.total }}</td>
             <td>
               <div>
                 <nz-rate [ngModel]="order.score" (ngModelChange)="updateOrders(order.id, $event, 'score')"

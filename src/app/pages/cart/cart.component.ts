@@ -31,7 +31,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 })
 export class CartComponent implements OnInit {
 
-  cartItems: any[] = [];
+  public cartItems: any[] = [];
 
   sum: number = 0;
 
@@ -44,31 +44,26 @@ export class CartComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.getCartItems();
     this.supabaseService.userId$.subscribe(userId => {
       this.userId = userId;
     });
-  }
-
-  /**
-   * 取得購物車商品
-   */
-  getCartItems(): void {
-    this.supabaseService.getCartItems()?.then(({ data, error }) => {
-      if (error) {
-        console.error(error);
+    this.supabaseService.cartItems$.subscribe(items => {
+      if (!this.userId){
+        this.messageService.info('請先登入');
+        return;
       }
-      else {
-        if (!this.userId){
-          this.messageService.info('請先登入');
-          return;
+      this.cartItems = items || [];
+      this.sum = this.cartItems.reduce((acc, item) => acc + (item.products.price * item.quantity), 0);
+      this.cartItems.forEach(item => {
+        if (item.quantity === 0) {
+          this.removeCartItem(item.id);
         }
-        this.cartItems = data || [];
-        this.sum = this.cartItems.reduce((acc, item) => {
-          return acc + (item.products.price * item.quantity);
-        }, 0);
-      }
+        if (item.products.stock < item.quantity) {
+          this.messageService.warning(`${item.products.name} 庫存不足，請調整數量`);
+        }
+      });
     });
+    this.supabaseService.fetchCartItems();
   }
 
   /**
@@ -81,7 +76,7 @@ export class CartComponent implements OnInit {
       }
       else {
         this.messageService.success('商品已移除');
-        this.getCartItems();
+        this.supabaseService.fetchCartItems();
       }
     });
   }
@@ -90,14 +85,20 @@ export class CartComponent implements OnInit {
    * 更新購物車商品數量
    */
   updateCartItem(itemId: string, quantity: number): void {
-    this.supabaseService.updateCartItem(itemId, quantity)?.then(({ error }) => {
-      if (error) {
-        console.error(error);
-      }
-      else {
-        this.getCartItems();
-      }
-    });
+    if (quantity === 0){
+      this.messageService.warning('數量不能為0');
+      this.removeCartItem(itemId);
+    }
+    else{
+      this.supabaseService.updateCartItem(itemId, quantity)?.then(({ error }) => {
+        if (error) {
+          console.error(error);
+        }
+        else {
+          this.supabaseService.fetchCartItems();
+        }
+      });
+    }
   }
 
   /**

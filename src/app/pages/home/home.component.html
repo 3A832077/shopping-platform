@@ -48,7 +48,12 @@
           <div class="product-info">
             <p>{{ item.name }}</p>
             <p>NT${{ item.price }}</p>
-            <button matButton="elevated">購買</button>
+            @if (item.stock === 0) {
+              <p class="text-danger">已售完</p>
+            }
+            @else {
+              <button matButton="elevated">購買</button>
+            }
           </div>
         </div>
       </div>
