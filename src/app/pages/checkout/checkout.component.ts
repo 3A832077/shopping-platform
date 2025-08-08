@@ -18,7 +18,6 @@ import { checkCardNumberValidator } from '../../validator/checkCradNumber';
 import { checkExpireDateValidator } from '../../validator/checkExpireDate';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { forkJoin, of } from 'rxjs';
-import { CartComponent } from '../cart/cart.component';
 
 @Component({
   selector: 'app-checkout',
@@ -250,7 +249,6 @@ export class CheckoutComponent implements OnInit {
       else {
         // 建立 orderItems 陣列
         const orderItems: any[] = this.cartItems.map(item => ({
-          name: this.form.value.name,
           city: this.form.value.city,
           area: this.form.value.area,
           store: this.form.value.store,
@@ -279,7 +277,7 @@ export class CheckoutComponent implements OnInit {
                 this.supabaseService.fetchCartItems();
               },
               error: err => {
-                console.error('刪除購物車失敗', err);
+                console.error(err);
               }
             });
 

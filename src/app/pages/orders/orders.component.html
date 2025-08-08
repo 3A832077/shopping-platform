@@ -13,11 +13,13 @@
     ngSkipHydration>
     <thead>
       <tr>
-        <th nzWidth="20px"></th>
-        <th nzWidth="180px">訂單日期</th>
-        <th nzWidth="180px">訂單編號</th>
-        <th nzWidth="180px">訂單狀態</th>
-        <th nzWidth="180px">訂單金額</th>
+        <th></th>
+        <th>訂單日期</th>
+        <th>訂單編號</th>
+        <th>訂單狀態</th>
+        <th>訂單金額</th>
+        <th>付款方式</th>
+        <th>運送方式</th>
         <th>買家評論</th>
         <th>更新時間</th>
       </tr>
@@ -36,9 +38,15 @@
             </td>
             <td>${{ order.total }}</td>
             <td>
+              {{ order.pay === '1' ? '信用卡' : '貨到付款' }}
+            </td>
+            <td>
+              {{ order.shipping === '1' ? '宅配' : '7-11取貨' }}
+            </td>
+            <td>
               <div>
                 <nz-rate [ngModel]="order.score" (ngModelChange)="updateOrders(order.id, $event, 'score')"
-                  [nzDisabled]="(order.date && (dateDiff(order.update, order.date) > 7))" nzAllowHalf>
+                  [disabled]="((dateDiff(order.update, order.date) > 7) || order.status !== 4)" nzAllowHalf>
                 </nz-rate>
               </div>
               <div style="padding-top: 10px;" [hidden]="editId === order.id" (click)="startEdit(order.id)" class="editable-cell">
@@ -46,32 +54,30 @@
               </div>
               <input [hidden]="editId !== order.id" [(ngModel)]="order.comment"
                 (blur)="updateOrders(order.id, order.comment, 'comment')" nz-input
-                [disabled]="(order.date && (dateDiff(order.update, order.date) > 7))"
+                [disabled]="((dateDiff(order.update, order.date) > 7) || order.status !== 4)"
                 placeholder="請輸入評論" style="width: 100%; margin-top: 10px;">
-              </td>
-              <td>{{ order.update | date: 'yyyy-MM-dd' }}</td>
+            </td>
+            <td>{{ order.update | date: 'yyyy-MM-dd' }}</td>
             </tr>
             <tr [nzExpand]="order.expand">
               <nz-table [nzData]="order.order_items" nzSize="middle" [nzShowPagination]="false" class="mt-3">
                 <thead>
                   <tr>
+                    <th>商品圖片</th>
                     <th>商品名稱</th>
                     <th>商品數量</th>
-                    <th>付款方式</th>
-                    <th>運送方式</th>
+                    <th>商品單價</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (product of order.order_items; track product) {
                     <tr>
-                      <td>{{ product.name }}</td>
+                      <td>
+                        <img [src]="product.img" style="width: 50px; height: 50px;">
+                      </td>
+                      <td>{{ product.productName }}</td>
                       <td>{{ product.quantity }}</td>
-                      <td>
-                        {{ product.pay === '1' ? '信用卡' : '貨到付款' }}
-                      </td>
-                      <td>
-                        {{ product.shipping === 'home' ? '宅配' : '7-11取貨' }}
-                      </td>
+                      <td>${{ product.price }}</td>
                     </tr>
                   }
                 </tbody>

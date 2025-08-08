@@ -48,6 +48,8 @@ export class OrdersComponent implements OnInit {
 
   editId: string | null = null;
 
+  products: any;
+
   statusMap: any = {
     0: '新成立',
     1: '確認',
@@ -95,6 +97,7 @@ export class OrdersComponent implements OnInit {
         return;
       }
       this.displayedList = data || [];
+      this.getProducts();
       this.total = count || 0;
       this.loading = false;
     });
@@ -142,6 +145,27 @@ export class OrdersComponent implements OnInit {
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   }
 
+  /**
+   * 取得所有商品資料
+   */
+  getProducts() {
+    this.supabaseService.getAllProducts()?.then(response => {
+      const { data, error } = response;
+      if (error) {
+        console.error(error);
+        return;
+      }
+      this.products = data || [];
+      this.displayedList.forEach(order => {
+        order.order_items.forEach((item: any) => {
+          const product = this.products.find((p: any) => p.id === item.products_id);
+          if (product) {
+            item.productName = product.name;
+          }
+        });
+      });
+    });
+  }
 
 
 

@@ -144,6 +144,13 @@ export class SupabaseService {
   }
 
   /**
+   * 取得所有商品資料
+   */
+  getAllProducts() {
+    return this.supabase?.from('products').select('*');
+  }
+
+  /**
    * 取得購物車商品
    */
   getCartItems() {
@@ -224,10 +231,11 @@ export class SupabaseService {
   getOrders(page: number, limit: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    return this.supabase?.from('orders').select(`*,
-      order_items(orders_id, name, quantity, pay, shipping)`,
-      { count: 'exact' }).order('update', { ascending: false }).order('id').range(from, to).
-      eq('member_id', this.userId$.getValue());
+    return this.supabase?.from('orders').select(`*,order_items(*)`, { count: 'exact' })
+      .order('id', { ascending: true })
+      .order('update', { ascending: false })
+      .order('date', { ascending: false })
+      .range(from, to).eq('member_id', this.userId$.getValue());
   }
   /**
    * 取得縣市列表
