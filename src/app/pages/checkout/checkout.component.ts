@@ -238,7 +238,9 @@ export class CheckoutComponent implements OnInit {
       date: new Date().toISOString(),
       update: new Date().toISOString(),
       status: 0,
-      total: sumPrice
+      total: sumPrice,
+      pay: this.payMethod,
+      shipping: this.shippingMethod,
     };
 
     this.supabaseService.createOrder(orders)?.then(({ data, error }) => {
@@ -254,8 +256,7 @@ export class CheckoutComponent implements OnInit {
           store: this.form.value.store,
           address: this.form.value.address,
           phone: this.form.value.phone,
-          pay: this.payMethod,
-          shipping: this.shippingMethod,
+          img: item.products.imageUrl,
           products_id: item.product_id,
           quantity: item.quantity,
           price: item.products.price,
