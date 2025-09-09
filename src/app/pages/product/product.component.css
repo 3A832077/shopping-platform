@@ -76,6 +76,7 @@ p{
   background-size: cover;
   background-position: center;
   border-radius: 8px;
+  position: relative;
 }
 
 .filter-block {
@@ -104,4 +105,13 @@ p{
   font-size: 1rem;
   font-weight: bold;
   margin-top: 10px;
+}
+
+.reward-badge {
+  position: absolute;
+  top: -1px;
+  right: -4px;
+  width: 40px;
+  height: auto;
+  z-index: 2;
 }

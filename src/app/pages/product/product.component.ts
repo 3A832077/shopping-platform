@@ -12,6 +12,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
 import { RouterLink } from '@angular/router';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-product',
@@ -27,8 +28,9 @@ import { NzPaginationModule } from 'ng-zorro-antd/pagination';
     NzCheckboxModule,
     NzInputNumberModule,
     RouterLink,
-    NzPaginationModule
-  ],
+    NzPaginationModule,
+    MatTooltipModule
+],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
 })
