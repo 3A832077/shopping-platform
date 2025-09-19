@@ -43,12 +43,6 @@
   }
 }
 
-.product-img {
-  width: 100%;
-  padding-top: 100%;
-  background-color: #f5f5f5;
-}
-
 .top-bar {
   display: flex;
   align-items: center;
@@ -76,6 +70,7 @@ p{
   background-size: cover;
   background-position: center;
   border-radius: 8px;
+  position: relative;
 }
 
 .filter-block {
@@ -97,4 +92,12 @@ p{
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.reward-badge {
+  position: absolute;
+  top: -1px;
+  right: -4px;
+  width: 40px;
+  height: auto;
 }

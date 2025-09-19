@@ -43,12 +43,6 @@
   }
 }
 
-.product-img {
-  width: 100%;
-  padding-top: 100%;
-  background-color: #f5f5f5;
-}
-
 .top-bar {
   display: flex;
   align-items: center;
@@ -113,5 +107,4 @@ p{
   right: -4px;
   width: 40px;
   height: auto;
-  z-index: 2;
 }

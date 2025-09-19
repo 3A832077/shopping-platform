@@ -13,6 +13,7 @@ import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
 import { RouterLink, Router } from '@angular/router';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-category',
@@ -29,7 +30,8 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
     NzInputNumberModule,
     RouterLink,
     NzPaginationModule,
-    NzPageHeaderModule
+    NzPageHeaderModule,
+    MatTooltipModule
   ],
   templateUrl: './category.component.html',
   styleUrl: './category.component.css'

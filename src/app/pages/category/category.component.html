@@ -66,6 +66,9 @@
           <div class="col-6 col-lg-4 col-xl-3 mb-4" >
             <div class="p-2 text-center" routerLink="/product/{{product.id}}" style="cursor: pointer;">
               <div class="product-img mb-2" [ngStyle]="{'background-image': 'url(' + product.imageUrl + ')'}">
+                @if (product.good){
+                  <img src="/img/reward.png" class="reward-badge" matTooltip="優良" matTooltipPosition="left"/>
+                }
               </div>
               <div>{{ product.name }}</div>
               @if (product.stock === 0) {

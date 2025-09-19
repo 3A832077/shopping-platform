@@ -12,6 +12,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-detail',
@@ -25,7 +26,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     NzPageHeaderModule,
     NzInputNumberModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatTooltipModule
   ],
   templateUrl: './detail.component.html',
   styleUrl: './detail.component.css'
