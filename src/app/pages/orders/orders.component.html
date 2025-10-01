@@ -46,7 +46,7 @@
             <td>
               <div>
                 <nz-rate [ngModel]="order.score" (ngModelChange)="updateOrders(order.id, $event, 'score')"
-                  [disabled]="((dateDiff(order.update, order.date) > 7) || order.status !== 4)" nzAllowHalf>
+                  [disabled]="((dateDiff(order.update, order.date) > 7) && order.status !== 4)" nzAllowHalf>
                 </nz-rate>
               </div>
               <div style="padding-top: 10px;" [hidden]="editId === order.id" (click)="startEdit(order.id)" class="editable-cell">
@@ -54,7 +54,7 @@
               </div>
               <input [hidden]="editId !== order.id" [(ngModel)]="order.comment"
                 (blur)="updateOrders(order.id, order.comment, 'comment')" nz-input
-                [disabled]="((dateDiff(order.update, order.date) > 7) || order.status !== 4)"
+                [disabled]="((dateDiff(order.update, order.date) > 7) && order.status !== 4)"
                 placeholder="請輸入評論" style="width: 100%; margin-top: 10px;">
             </td>
             <td>{{ order.update | date: 'yyyy-MM-dd' }}</td>
