@@ -75,10 +75,11 @@ export class SupabaseService {
    * 使用 Google 登入
    */
   googleLogin() {
+    const redirectTo = env.apiUrl || window.location.origin;
     return this.supabase?.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: redirectTo,
       },
     });
   }
