@@ -9,6 +9,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { SupabaseService } from './service/supabase.service';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
     selector: 'app-root',
@@ -32,7 +33,8 @@ export class AppComponent implements OnInit {
 
   constructor(
                 private supabaseService: SupabaseService,
-                private router: Router
+                private router: Router,
+                private message: NzMessageService,
              ){
                 this.supabaseService.userId$.subscribe(userId => {
                   this.userId = userId;

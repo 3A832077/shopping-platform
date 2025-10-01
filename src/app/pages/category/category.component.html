@@ -45,6 +45,24 @@
         </div>
 
         <nz-divider />
+
+        <div class="filter-block">
+          <div class="filter-header" (click)="excellentIsExpanded = !excellentIsExpanded">
+            <span>優良商品</span>
+            <i nz-icon [nzType]="excellentIsExpanded ? 'minus' : 'plus'"></i>
+          </div>
+
+          @if (excellentIsExpanded) {
+            <div class="filter-content">
+              <label nz-checkbox [(ngModel)]="onlyExcellent"
+                (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, id, minPrice, maxPrice, onlyExcellent)">
+                只顯示優良商品
+              </label>
+            </div>
+          }
+        </div>
+
+        <nz-divider />
         <p (click)="resetFilter()" style="cursor: pointer;"><nz-icon nzType="redo"/> 清除篩選條件</p>
       </div>
     </div>

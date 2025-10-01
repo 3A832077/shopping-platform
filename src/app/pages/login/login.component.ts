@@ -63,6 +63,7 @@ export class LoginComponent implements OnInit {
       const { email, password } = this.form.value;
       const result = await this.supabaseService.login(email, password);
       if (result?.error) {
+        this.message.error('登入失敗，電子郵件或密碼錯誤');
         console.error(result.error);
       }
       else {

@@ -56,6 +56,10 @@ export class ProductComponent implements OnInit {
 
   priceIsExpanded = false;
 
+  excellentIsExpanded = false;
+
+  onlyExcellent: boolean = false;
+
   minPrice: number = 0;
 
   maxPrice: number = 0;
@@ -101,7 +105,7 @@ export class ProductComponent implements OnInit {
     if (this.selectCategory.length === 0) {
       this.selectCategory = undefined;
     }
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice, this.onlyExcellent);
   }
 
   /**
@@ -109,9 +113,9 @@ export class ProductComponent implements OnInit {
    * @param pageIndex
    * @param pageSize
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number) {
+  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean) {
     sort = this.selectSort === true ? true : false;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, count, error }) => {
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice, excellent)?.then(({ data, count, error }) => {
       if (error) {
         console.error(error);
         return;
@@ -131,7 +135,7 @@ export class ProductComponent implements OnInit {
         return;
       }
       this.categoryList = data || [];
-      this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
+      this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice, this.onlyExcellent);
     });
   }
 
@@ -144,7 +148,8 @@ export class ProductComponent implements OnInit {
     this.minPrice = 0;
     this.maxPrice = 0;
     this.selectCategory = undefined;
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice);
+    this.onlyExcellent = false;
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.selectCategory, this.minPrice, this.maxPrice, this.onlyExcellent);
   }
 
 

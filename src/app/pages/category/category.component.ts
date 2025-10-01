@@ -62,6 +62,10 @@ export class CategoryComponent implements OnInit {
 
   total: number = 0;
 
+  onlyExcellent: boolean = false;
+
+  excellentIsExpanded = false;
+
   constructor(
                 private supabaseService: SupabaseService,
                 private router: Router
@@ -81,7 +85,7 @@ export class CategoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice);
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice, this.onlyExcellent);
     this.onResize();
   }
 
@@ -95,9 +99,9 @@ export class CategoryComponent implements OnInit {
   /**
    * 取得產品列表
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: number, minPrice?: number, maxPrice?: number) {
+  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: number, minPrice?: number, maxPrice?: number, excellent?: boolean) {
     sort = this.selectSort === false ? false : true;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice)?.then(({ data, error, count }) => {
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice, excellent)?.then(({ data, error, count }) => {
       if (error) {
         console.error(error);
         return;
@@ -116,7 +120,8 @@ export class CategoryComponent implements OnInit {
     this.selectSort = false;
     this.minPrice = 0;
     this.maxPrice = 0;
-    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice);
+    this.onlyExcellent = false;
+    this.getProducts(this.pageIndex, this.pageSize, this.selectSort, this.id, this.minPrice, this.maxPrice, this.onlyExcellent);
   }
 
   /**
