@@ -6,6 +6,7 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { RevealOnScrollDirective } from '../../directive/reveal-on-scroll.directive';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,8 @@ import { RouterLink } from '@angular/router';
     NzDividerModule,
     NzButtonModule,
     MatButtonModule,
-    RouterLink
+    RouterLink,
+    RevealOnScrollDirective
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'

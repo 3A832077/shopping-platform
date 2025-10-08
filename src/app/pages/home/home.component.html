@@ -27,8 +27,9 @@
 <nz-divider></nz-divider>
 <div class="row pt-2">
   <h4>商品分類</h4>
-    @for (item of categoryList; track item) {
-      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center" routerLink="/category/{{ item.id }}">
+    @for (item of categoryList; track item; let i = $index) {
+      <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center"
+        routerLink="/category/{{ item.id }}" appRevealOnScroll [appRevealOnScrollDelay]="i * 100">
         <div class="category-container">
           <img src="/img/{{ item.img }}.jpg" class="img-fluid categoryImg"/>
           <div class="overlay">
@@ -41,8 +42,9 @@
 <nz-divider></nz-divider>
 <div class="row pt-2">
   <h4>最新商品</h4>
-    @for (item of productsList; track $index) {
-      <div class="col-12 col-sm-6 col-md-4 mb-3 d-flex justify-content-center" routerLink="/product/{{ item.id }}">
+    @for (item of productsList; track $index; let i = $index) {
+      <div class="col-12 col-sm-6 col-md-4 mb-3 d-flex justify-content-center"
+        routerLink="/product/{{ item.id }}" appRevealOnScroll [appRevealOnScrollDelay]="i * 100">
         <div class="product-container">
           <img src="{{ item.imageUrl }}" />
           <div class="product-info">

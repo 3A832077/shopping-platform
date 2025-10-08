@@ -53,17 +53,19 @@
 h4{
   text-align: center;
   padding-bottom: 20px;
+  font-weight: bold;
 }
 
 .product-container:hover {
   transform: scale(1.011);
-  box-shadow: 0 6px 22px rgba(0,0,0,0.18);
+  transition: transform 0.3s ease;
   cursor: pointer;
 }
 
 .product-info{
   text-align: center;
   margin-top: 10px;
+  font-weight: 500;
 }
 
 .product-container {
@@ -71,9 +73,7 @@ h4{
   max-width: 400px;
   min-width: 0;
   min-height: 340px;
-  box-shadow: 0 2px 8px #eee;
   border-radius: 8px;
-  background: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -85,4 +85,19 @@ h4{
   max-width: 200px;
   height: 200px;
   object-fit: contain;
+}
+
+/* 動畫元素的初始狀態 */
+.reveal {
+  position: relative;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  will-change: opacity, transform; /* 提升動畫效能 */
+}
+
+/* 當元素進入可視範圍時，觸發動畫的狀態 */
+.reveal.visible {
+  opacity: 1;
+  transform: translateX(0);
 }
