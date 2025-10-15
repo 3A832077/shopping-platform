@@ -4,8 +4,6 @@ import { SellerComponent } from './pages/seller/seller.component';
 import { HomeComponent } from './pages/main/home/home.component';
 import { CartComponent } from './pages/main/cart/cart.component';
 import { LoginComponent } from './pages/main/login/login.component';
-import { CategoryComponent } from './pages/main/category/category.component';
-import { ProductComponent } from './pages/main/product/product.component';
 import { OrdersComponent } from './pages/main/orders/orders.component';
 import { DashboardComponent } from './pages/seller/dashboard/dashboard.component';
 import { ProductsComponent } from './pages/seller/products/products.component';
@@ -30,7 +28,7 @@ export const routes: Routes = [
         loadChildren: () => import('./pages/main/product/product.routes').then(m => m.productsRoutes)
       },
       { path: 'order', component: OrdersComponent },
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: '', redirectTo: '/home', pathMatch: 'full' },
     ],
   },
   // --- 後台(賣家)路由群組 ---
@@ -42,7 +40,7 @@ export const routes: Routes = [
       { path: 'products', component: ProductsComponent },
       { path: 'orders', component: SellerOrdersComponent },
       { path: 'inspections', component: InspectionsComponent },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+      { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
     ],
   },
 
