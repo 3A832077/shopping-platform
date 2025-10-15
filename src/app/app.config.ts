@@ -10,6 +10,8 @@ import zh from '@angular/common/locales/zh';
 import { FormsModule } from '@angular/forms';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideEchartsCore } from 'ngx-echarts';
+import * as echarts from 'echarts/core';
 
 registerLocaleData(zh);
 
@@ -23,5 +25,6 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(FormsModule),
     provideAnimationsAsync(),
     provideHttpClient(withFetch()),
+    provideEchartsCore({ echarts }),
   ]
 };

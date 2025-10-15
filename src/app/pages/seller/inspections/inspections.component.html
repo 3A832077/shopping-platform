@@ -1,0 +1,78 @@
+<div nz-row class="header-container">
+  <button nz-button nzType="primary" (click)="openModal()" [disabled]="!userId">
+    <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
+    <span>申請品質檢定</span>
+  </button>
+</div>
+<nz-table #filterTable
+  [nzData]="displayedList"
+  [nzTotal]="total"
+  [nzPageSize]="pageSize"
+  [nzPageIndex]="pageIndex"
+  [nzLoading]="loading"
+  [nzShowTotal]="totalTemplate"
+  nzShowSizeChanger
+  nzFrontPagination="false"
+  (nzPageIndexChange)="getInspections($event, pageSize)"
+  (nzPageSizeChange)="getInspections(pageIndex, $event)"
+  ngSkipHydration>
+  <thead>
+    <tr>
+      <th>商品名稱</th>
+      <th>類別</th>
+      <th>是否通過</th>
+      <th>是否優良</th>
+      <th>鑑定日期&時間</th>
+      <th nzWidth="220px">檢測連結</th>
+      <th>更新時間</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of filterTable.data; track item) {
+      <tr>
+        <td>{{ item.product }}</td>
+        <td>{{ item.category }}</td>
+        <td>
+          @switch (item.pass) {
+            @case (1) {
+              通過
+            }
+            @case (0) {
+              不通過
+            }
+            @default {
+              尚未檢測
+            }
+          }
+        </td>
+        <td>
+          @switch (item.excellent) {
+            @case (1) {
+              優良
+            }
+            @case (0) {
+              非優良
+            }
+            @default {
+              尚未檢測
+            }
+          }
+        </td>
+        <td>{{ (item.date + 'T' + item.detailTime) | date:'yyyy-MM-dd HH:mm' }}</td>
+        <td>
+          @if (item.url) {
+            <button nz-button nzType="link" (click)="openLink(item.url)"
+              [disabled]="!canOpenLink((item.date + 'T' + item.detailTime))" >
+              {{ item.url }}
+            </button>
+          }
+        </td>
+        <td>{{ item.update | date: 'yyyy-MM-dd' }}</td>
+      </tr>
+    }
+  </tbody>
+</nz-table>
+<ng-template #totalTemplate>
+  總共 {{ total }} 筆
+</ng-template>
+

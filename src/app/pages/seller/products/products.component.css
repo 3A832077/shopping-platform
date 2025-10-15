@@ -1,0 +1,25 @@
+img{
+  max-width: 150px;
+  max-height: 100px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+nz-table {
+  width: 100%;
+}
+
+.container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.actionDiv{
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+

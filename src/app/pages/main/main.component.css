@@ -1,0 +1,74 @@
+:host {
+  display: flex;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[nz-menu] {
+  line-height: 64px;
+}
+
+nz-content {
+  height: auto;
+  width: auto;
+}
+
+nz-footer {
+  text-align: center;
+  background: #fff;
+}
+
+.inner-content {
+  box-sizing: border-box;
+  padding: 12px;
+  min-height: calc(100vh - 100px);
+  height: auto;
+  width: auto;
+  padding: 24px;
+  opacity: 1;
+  backdrop-filter: blur(2px);
+}
+
+nz-header {
+  padding: 0;
+  width: 100%;
+  z-index: 2;
+  position: sticky;
+  top: 0;
+  background: transparent;
+  box-shadow: 0 2px 8px rgba(0, 21, 41, 0.08);
+  backdrop-filter: blur(2px);
+
+  .logo {
+    width: 90px;
+    height: 70px;
+    float: left;
+  }
+}
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  backdrop-filter: blur(2px);
+}
+
+.menu-right {
+  margin-left: auto;
+  display: flex;
+}
+
+:host {
+  ::ng-deep .ant-layout,
+  ::ng-deep .ant-layout-content,
+  ::ng-deep .ant-layout-footer,
+  ::ng-deep .ant-layout-header,
+  ::ng-deep .ant-divider {
+    background: transparent;
+  }
+}
+
+::ng-deep .ant-menu-horizontal{
+  border: none;
+}

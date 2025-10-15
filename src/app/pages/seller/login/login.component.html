@@ -1,0 +1,63 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <div>
+      <div class="mb-30">
+        <h4>{{ isRegister ? '註冊' : '登入' }}</h4>
+      </div>
+      <form [formGroup]="form">
+        <nz-form-item>
+          <nz-form-control>
+            <input nz-input formControlName="email" placeholder="請輸入電子郵件" autocomplete="email"/>
+          </nz-form-control>
+          @if (form.get('email')?.errors?.['required']) {
+            <span class="error">電子郵件為必填項</span>
+          }
+          @if (form.get('email')?.errors?.['email']) {
+            <span class="error">電子郵件格式錯誤</span>
+          }
+        </nz-form-item>
+        <nz-form-item>
+          <nz-form-control>
+            <input nz-input type="password" formControlName="password" placeholder="請輸入密碼" autocomplete="current-password"/>
+          </nz-form-control>
+          @if (form.get('password')?.errors?.['required']) {
+            <span class="error">密碼為必填項</span>
+          }
+          @if (form.get('password')?.errors?.['passwordError']) {
+            <span class="error">密碼格式錯誤</span>
+          }
+        </nz-form-item>
+        @if (!isRegister) {
+          <div class="actionDiv">
+            <a (click)="openModal(tplContent)">忘記密碼?</a>
+            <a (click)="toggleMode()">註冊</a>
+          </div>
+        }
+        <div class="buttonDiv">
+          @if (isRegister) {
+            <button nz-button nzType="primary" (click)="register()">註冊</button>
+            <a (click)="toggleMode()">已有帳號? 登入</a>
+          }
+          @else {
+            <button nz-button nzType="primary" (click)="login()">登入</button>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<ng-template #tplContent>
+  <div class="modal-content">
+    <p>請輸入您的電子郵件以接收重設密碼的連結。</p>
+    <nz-form-item>
+      <nz-form-control>
+        <input nz-input [(ngModel)]="email" placeholder="請輸入電子郵件" />
+      </nz-form-control>
+    </nz-form-item>
+    <div class="buttonDiv">
+      <button nz-button nzType="primary" (click)="sendResetEmail()">發送重設郵件</button>
+      <button nz-button nzType="default" (click)="close()">取消</button>
+    </div>
+  </div>
+</ng-template>
+

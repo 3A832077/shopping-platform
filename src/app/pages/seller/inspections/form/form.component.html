@@ -1,0 +1,144 @@
+<form [formGroup]="form">
+  <div nz-col nzSpan="24" class="pb-10">
+    <nz-form-item>
+      <nz-form-label [nzSpan]="4">商品類別</nz-form-label>
+      <nz-form-control [nzSpan]="18">
+        <nz-select formControlName="category" nzPlaceHolder="請選擇商品類別" nzShowSearch nzAllowClear (ngModelChange)="categoryChange($event)">
+          @for (category of categoryList; track category) {
+            <nz-option [nzValue]="category.name" [nzLabel]="category.name"></nz-option>
+          }
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  @if (form.get('category')?.value) {
+    <div nz-col nzSpan="24" class="pb-10">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="4">商品名稱</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <nz-select formControlName="product" nzPlaceHolder="請選擇產品" nzShowSearch nzAllowClear>
+            @for (product of selectedProducts; track product) {
+              <nz-option [nzValue]="product" [nzLabel]="product"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  }
+  <div nz-col nzSpan="24" class="pb-10">
+    <nz-form-item>
+      <nz-form-label [nzSpan]="4">檢測日期</nz-form-label>
+      <nz-form-control [nzSpan]="18">
+        <nz-select formControlName="date" nzPlaceHolder="請選擇檢測日期" nzShowSearch nzAllowClear >
+          @for (date of weekList; track date) {
+            <nz-option [nzLabel]="date.label" [nzValue]="date.value"></nz-option>
+          }
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-col nzSpan="24" class="pb-10">
+    <nz-form-item>
+      <nz-form-label nzSpan="4">檢測時段</nz-form-label>
+      <nz-form-control [nzSpan]="18">
+        <nz-select formControlName="time" nzPlaceHolder="請選擇檢測時段" nzShowSearch nzAllowClear (ngModelChange)="timeChange($event)">
+          @for (time of timeList; track time) {
+            <nz-option [nzLabel]="time.label" [nzValue]="time.label"></nz-option>
+          }
+        </nz-select>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  @if (form.get('time')?.value) {
+    <div nz-col nzSpan="24" class="pb-10">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="4">詳細時間</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <nz-select formControlName="detailTime" nzPlaceHolder="請選擇詳細時間" nzShowSearch nzAllowClear>
+            @for (detail of detailTimeList; track detail) {
+              <nz-option [nzLabel]="detail.label" [nzValue]="detail.value"></nz-option>
+            }
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  }
+  <div nz-col nzSpan="24" class="pb-10">
+    <nz-form-item>
+      <nz-form-label [nzSpan]="4">持卡人姓名</nz-form-label>
+      <nz-form-control [nzSpan]="18">
+        <input nz-input formControlName="name" placeholder="請輸入持卡人姓名"/>
+      </nz-form-control>
+    </nz-form-item>
+  </div>
+  <div nz-row nzGutter="16" class="pb-10">
+    <div nz-col nzSpan="16">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="6">信用卡號</nz-form-label>
+        <nz-form-control [nzSpan]="18">
+          <input nz-input formControlName="cardNumber" maxlength="16" autocomplete="cc-number" (ngModelChange)="checkCardType($event)"/>
+          @if (form.get('cardNumber')?.errors?.['required']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">信用卡號為必填</span>
+            </div>
+          }
+          @if (form.get('cardNumber')?.errors?.['invalidCardNumber']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">無效的信用卡號</span>
+            </div>
+          }
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col nzSpan="6">
+      @if (cardTypeImg) {
+        <img [src]="cardTypeImg" alt="信用卡類型" height="32px"/>
+      }
+    </div>
+  </div>
+  <div nz-row nzGutter="12">
+    <div nz-col nzSpan="12" class="pb-10">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="8">到期日</nz-form-label>
+        <nz-form-control [nzSpan]="14">
+          <nz-date-picker formControlName="expiryDate" nzFormat="MM/yyyy" nzMode="month" nzPlaceHolder="請選擇到期日">
+          </nz-date-picker>
+          @if (form.get('expiryDate')?.errors?.['required']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">到期日為必填</span>
+            </div>
+          }
+          @if (form.get('expiryDate')?.errors?.['expired']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">這張卡已過期</span>
+            </div>
+          }
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col nzSpan="12" class="pb-10">
+      <nz-form-item>
+        <nz-form-label [nzSpan]="11">安全碼</nz-form-label>
+        <nz-form-control [nzSpan]="11">
+          <input nz-input formControlName="csv" maxlength="3" class="csvInput" type="password" autocomplete="cc-csc"/>
+          @if (form.get('csv')?.errors?.['required']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">安全碼為必填</span>
+            </div>
+          }
+          @if (form.get('csv')?.errors?.['pattern']) {
+            <div style="margin-top: 5px;">
+              <span style="color:red;">無效的安全碼</span>
+            </div>
+          }
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+  <nz-divider></nz-divider>
+  <div class="buttonDiv">
+    <button nz-button nzType="primary" (click)="createEvent()">新增</button>
+    <button nz-button nzType="default" (click)="close()">取消</button>
+  </div>
+</form>
+

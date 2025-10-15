@@ -1,0 +1,49 @@
+<div class="pb-50">
+  <nz-row [nzGutter]="24">
+    <!-- 銷售額 -->
+    <nz-col [nzXs]="24" [nzSm]="12" [nzMd]="6">
+      <nz-card class="card">
+        <nz-statistic [nzValue]="salesAmount" nzTitle="銷售額" nzPrefix="$"></nz-statistic>
+      </nz-card>
+    </nz-col>
+
+    <!-- 訂單數 -->
+    <nz-col [nzXs]="24" [nzSm]="12" [nzMd]="6">
+      <nz-card class="card">
+        <nz-statistic [nzValue]="orderCount" nzTitle="訂單數" nzSuffix="筆"></nz-statistic>
+      </nz-card>
+    </nz-col>
+
+    <!-- 買家評價 -->
+    <nz-col [nzXs]="24" [nzSm]="12" [nzMd]="6">
+      <nz-card class="card">
+        <nz-statistic [nzValue]="orderComment" nzTitle="買家評價" nzSuffix="個"></nz-statistic>
+      </nz-card>
+    </nz-col>
+
+    <!-- 客單價 -->
+    <nz-col [nzXs]="24" [nzSm]="12" [nzMd]="6">
+      <nz-card class="card">
+        <nz-statistic [nzValue]="aov" nzTitle="客單價" nzPrefix="$"></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</div>
+<div nz-col nzSpan="24">
+  <nz-row [nzGutter]="24">
+    <nz-col [nzSpan]="12">
+      <nz-card nzTitle="各商品銷售量">
+        @if (isBrowser) {
+          <div echarts [options]="barOptions" class="chartDiv"></div>
+        }
+      </nz-card>
+    </nz-col>
+    <nz-col [nzSpan]="12">
+      <nz-card nzTitle="各類別銷售額佔比">
+        @if (isBrowser) {
+          <div echarts [options]="pieOptions" class="chartDiv"></div>
+        }
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</div>

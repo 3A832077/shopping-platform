@@ -1,0 +1,72 @@
+<div nz-row class="header-container">
+  <div class="actionDiv">
+    <input nz-input placeholder="搜尋商品" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()"/>
+    <button nz-button nzType="primary" (click)="openModal(false)" [disabled]="!userId">
+      <nz-icon nzType="plus" nzTheme="outline"></nz-icon>
+      <span>新增商品</span>
+    </button>
+  </div>
+</div>
+<div class="container">
+  <nz-table #filterTable
+    [nzData]="displayedList"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    [nzLoading]="loading"
+    [nzShowTotal]="totalTemplate"
+    nzShowSizeChanger
+    nzFrontPagination="false"
+    (nzPageIndexChange)="getProducts($event, pageSize)"
+    (nzPageSizeChange)="getProducts(pageIndex, $event)"
+    ngSkipHydration>
+    <thead>
+      <tr>
+        <th nzAlign="center">圖片</th>
+        <th nzAlign="center">商品名稱</th>
+        <th nzAlign="center" nzShowFilter (nzFilterChange)="filterSort(null ,'category', $event)" [nzFilters]="categoryFilter">商品類別</th>
+        <th nzAlign="center" nzShowSort (nzSortOrderChange)="filterSort($event, 'price', null)">價格</th>
+        <th nzAlign="center">庫存</th>
+        <th nzAlign="center">說明</th>
+        <th nzAlign="center">狀態</th>
+        <th nzAlign="center" nzShowSort (nzSortOrderChange)="filterSort($event, 'update', null)">更新時間</th>
+        <th nzAlign="center" nzWidth="200px">操作</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (data of filterTable.data; track data) {
+        <tr>
+          <td nzAlign="center">
+            <img src="{{data.imageUrl}}"/>
+          </td>
+          <td nzAlign="center">{{ data.name }}</td>
+          <td nzAlign="center">{{ data.categoryName }}</td>
+          <td nzAlign="center">{{ data.price }}</td>
+          <td nzAlign="center">{{ data.stock }}</td>
+          <td nzAlign="center">{{ data.info }}</td>
+          <td nzAlign="center">
+            @if (data.status) {
+              <span>上架</span>
+            }
+            @if (!data.status) {
+              <span>下架</span>
+            }
+          </td>
+          <td nzAlign="center">{{ data.update | date: 'yyyy-MM-dd' }}</td>
+          <td nzAlign="center">
+            <button nz-button nzType="link" (click)="openModal(true, data)" [disabled]="!userId">編輯</button>
+            <nz-divider nzType="vertical"></nz-divider>
+            <button nzType="link" nz-button (click)="deleteProduct(data.id)" [disabled]="!userId">刪除</button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</div>
+<ng-template #totalTemplate>
+  總共 {{ total }} 筆
+</ng-template>
+
+
+
+
