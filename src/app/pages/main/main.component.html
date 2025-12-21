@@ -7,7 +7,11 @@
     </div>
     <ul nz-menu nzMode="horizontal" class="menu-bar">
       <div class="menu-right">
-        <li nz-menu-item routerLink="/cart" [nzSelected]="isActive('/cart')">購物車</li>
+        <li nz-menu-item routerLink="/cart" [nzSelected]="isActive('/cart')">
+          <nz-badge [nzCount]="cartCount" [nzOffset]="[5, -6]">
+            <span>購物車</span>
+          </nz-badge>
+        </li>
         <li nz-menu-item routerLink="/order" [nzSelected]="isActive('/order')">訂單紀錄</li>
         @if (sellerEmail && sellerId) {
           <li nz-menu-item routerLink="/seller/dashboard" [nzSelected]="isActive('/seller/dashboard')">賣家後台</li>

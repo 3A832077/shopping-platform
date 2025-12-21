@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { formatDate } from '@angular/common';
 import { FormsModule,ReactiveFormsModule,FormGroup,FormBuilder,Validators } from '@angular/forms';
@@ -75,11 +75,9 @@ export class FormComponent implements OnInit {
     private sellerService: SellerService,
     private modalService: NzModalService
   ) {
-      this.sellerService.authToken$.subscribe(authToken => {
-        this.accessToken = authToken;
-      });
-      this.sellerService.isExpired$.subscribe(isExpired => {
-        this.isExpired = isExpired;
+      effect(() => {
+        this.accessToken = this.sellerService.authToken();
+        this.isExpired = this.sellerService.isExpired();
       });
     }
 

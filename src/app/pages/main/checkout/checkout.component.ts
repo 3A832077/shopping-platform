@@ -239,7 +239,7 @@ export class CheckoutComponent implements OnInit {
       );
     }, 0);
     const orders: any = {
-      member_id: this.supabaseService.userId$.getValue(),
+      member_id: this.supabaseService.userId,
       date: new Date().toISOString(),
       update: new Date().toISOString(),
       status: 0,

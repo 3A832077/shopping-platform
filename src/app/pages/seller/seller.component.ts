@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -55,17 +55,11 @@ export class SellerComponent {
                 private modalService: NzModalService,
                 public sellerService: SellerService
               ) {
-                this.sellerService.userId$.subscribe(userId => {
-                  this.userId = userId;
-                });
-                this.sellerService.email$.subscribe(email => {
-                  this.email = email;
-                });
-                this.sellerService.authToken$.subscribe(authToken => {
-                  this.accessToken = authToken;
-                });
-                this.sellerService.isExpired$.subscribe(isExpired => {
-                  this.isExpired = isExpired;
+                effect(() => {
+                  this.userId = this.sellerService.userId();
+                  this.email = this.sellerService.email();
+                  this.accessToken = this.sellerService.authToken();
+                  this.isExpired = this.sellerService.isExpired();
                 });
               }
   ngOnInit() {

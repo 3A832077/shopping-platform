@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../env/environment';
 import { Database } from '../types/supabase';
@@ -11,13 +11,13 @@ export class SellerService {
 
   private supabase?: SupabaseClient;
 
-  userId$ = new BehaviorSubject<string | null>(null);
+  userId = signal<string | null>(null);
 
-  email$ = new BehaviorSubject<string | null>(null);
+  email = signal<string | null>(null);
 
-  authToken$ = new BehaviorSubject<string | null>(null);
+  authToken = signal<string | null>(null);
 
-  isExpired$ = new BehaviorSubject<boolean>(false);
+  isExpired = signal<boolean>(false);
 
   constructor() {
     this.createClient();
@@ -63,16 +63,16 @@ export class SellerService {
   loginState() {
     return this.supabase?.auth.onAuthStateChange((_, session: Session | null) => {
       if (session) {
-        this.userId$.next(session.user.id);
-        this.email$.next(session.user.email ?? null);
-        this.authToken$.next(session.provider_token ?? null);
-        this.isExpired$.next(session.expires_at ? session.expires_at > Date.now() : false);
+        this.userId.set(session.user.id);
+        this.email.set(session.user.email ?? null);
+        this.authToken.set(session.access_token);
+        this.isExpired.set(session.expires_at ? (Date.now() >= session.expires_at * 1000) : false);
       }
       else {
-        this.userId$.next(null);
-        this.email$.next(null);
-        this.authToken$.next(null);
-        this.isExpired$.next(false);
+        this.userId.set(null);
+        this.email.set(null);
+        this.authToken.set(null);
+        this.isExpired.set(false);
       }
     });
   }

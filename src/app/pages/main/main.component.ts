@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, RouterOutlet, Router } from '@angular/router';
 import { NzCarouselModule } from 'ng-zorro-antd/carousel';
@@ -14,6 +14,8 @@ import { LoginComponent } from '../seller/login/login.component';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { SellerService } from '../../service/seller.service';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+
 @Component({
   selector: 'app-main',
   imports: [
@@ -27,7 +29,8 @@ import { SellerService } from '../../service/seller.service';
     NzLayoutModule,
     NzDropDownModule,
     NzDividerModule,
-    NzModalModule
+    NzModalModule,
+    NzBadgeModule
   ],
   templateUrl: './main.component.html',
   styleUrl: './main.component.css'
@@ -42,24 +45,19 @@ export class MainComponent implements OnInit {
 
   sellerEmail: string | null = null;
 
+  cartCount: number = 0;
+
   constructor(
-                private supabaseService: SupabaseService,
+                public supabaseService: SupabaseService,
                 private router: Router,
                 private message: NzMessageService,
                 private modalService: NzModalService,
                 public sellerService: SellerService
               ){
-                this.supabaseService.userId$.subscribe(userId => {
-                  this.userId = userId;
-                });
-                this.supabaseService.email$.subscribe(email => {
-                  this.email = email;
-                });
-                this.sellerService.userId$.subscribe(sellerId => {
-                  this.sellerId = sellerId;
-                });
-                this.sellerService.email$.subscribe(sellerEmail => {
-                  this.sellerEmail = sellerEmail;
+                effect(() => {
+                  this.userId = this.supabaseService.userId();
+                  this.email = this.supabaseService.email();
+                  this.cartCount = this.supabaseService.cartCount();
                 });
               }
 

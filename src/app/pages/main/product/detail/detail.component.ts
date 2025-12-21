@@ -96,17 +96,23 @@ export class DetailComponent implements OnInit {
    * 新增商品到購物車
    */
   addToCart(productId: number, quantity: number = 1, buyNow: boolean = false) {
-    this.supabaseService.addToCart(productId, quantity)?.then(({ data, error }) => {
-      if (error) {
-        console.error('Error adding product to cart:', error);
+    this.supabaseService.addToCart(productId, quantity).then((result) => {
+      // 注意：這裡要判斷 result 是否為空或包含 error
+      if (result?.error) {
+        console.error(result.error);
+        this.message.error('加入失敗');
       }
       else {
         this.message.success('已加入購物車！');
+        this.supabaseService.fetchCartItems();
         if (buyNow) {
           this.router.navigate(['/cart']);
         }
       }
-    });
-  }
+    }).catch(err => {
+      console.error(err);
+  });
+
+}
 
 }

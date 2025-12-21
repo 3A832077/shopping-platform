@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { OnInit } from '@angular/core';
@@ -40,13 +40,15 @@ export class CartComponent implements OnInit {
     private supabaseService: SupabaseService,
     private messageService: NzMessageService,
     private modalService: NzModalService
-  ) {}
+  ) {
+    effect(() => {
+      this.userId = this.supabaseService.userId();
+      this.cartItems = this.supabaseService.cartItems() || [];
+    });
+  }
 
   ngOnInit(): void {
-    this.supabaseService.userId$.subscribe((userId) => {
-      this.userId = userId;
-    });
-    this.supabaseService.cartItems$.subscribe((items) => {
+    this.cartItems.forEach((items) => {
       if (!this.userId) {
         this.messageService.info('請先登入');
         return;
@@ -89,18 +91,17 @@ export class CartComponent implements OnInit {
    */
   updateCartItem(itemId: string, quantity: number): void {
     if (quantity === 0) {
-      this.messageService.warning('數量不能為0');
       this.removeCartItem(itemId);
-    } else {
-      this.supabaseService
-        .updateCartItem(itemId, quantity)
-        ?.then(({ error }) => {
-          if (error) {
-            console.error(error);
-          } else {
-            this.supabaseService.fetchCartItems();
-          }
-        });
+    }
+    else {
+      this.supabaseService.updateCartItem(itemId, quantity)?.then(({ error }) => {
+        if (error) {
+          console.error(error);
+        }
+        else {
+          this.supabaseService.fetchCartItems();
+        }
+      });
     }
   }
 

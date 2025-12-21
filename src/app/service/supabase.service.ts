@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../env/environment';
 import { Database } from '../types/supabase';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -11,11 +10,17 @@ export class SupabaseService {
 
   supabase?: SupabaseClient;
 
-  userId$ = new BehaviorSubject<string | null>(null);
+  // 使用 Signal 管理狀態
+  userId = signal<string | null>(null);
 
-  email$ = new BehaviorSubject<string | null>(null);
+  email = signal<string | null>(null);
 
-  cartItems$ = new BehaviorSubject<any[]>([]);
+  cartItems = signal<any[]>([]);
+
+  // 利用 computed 自動追蹤數量，當 cartItems 改變時，這個值也會跟著變
+  cartCount = computed(() =>
+    this.cartItems().reduce((acc, item) => acc + item.quantity, 0)
+  );
 
   constructor() {
     this.createClient();
@@ -26,7 +31,7 @@ export class SupabaseService {
    * 建立 Supabase 客戶端
    */
   createClient() {
-    if (typeof window === 'undefined' || createClient<Database> === undefined) return;
+    if (typeof window === 'undefined' || createClient === undefined) return;
     this.supabase = createClient<Database>(env.supabaseUrl, env.supabaseKey);
   }
 
@@ -48,7 +53,7 @@ export class SupabaseService {
     return this.supabase?.auth.signUp({ email, password });
   }
 
-  /**
+   /**
    * 使用者登出
    */
   logout() {
@@ -61,12 +66,14 @@ export class SupabaseService {
   loginState() {
     return this.supabase?.auth.onAuthStateChange((_, session: Session | null) => {
       if (session) {
-        this.userId$.next(session.user.id);
-        this.email$.next(session.user.email ?? null);
+        this.userId.set(session.user.id);
+        this.email.set(session.user.email ?? null);
+        this.fetchCartItems(); // 登入後自動抓取購物車
       }
       else {
-        this.userId$.next(null);
-        this.email$.next(null);
+        this.userId.set(null);
+        this.email.set(null);
+        this.cartItems.set([]); // 登出時清空
       }
     });
   }
@@ -112,8 +119,7 @@ export class SupabaseService {
 
     if (Array.isArray(category) && category.length > 0) {
       query = query?.in('category', category);
-    }
-    else if (category !== undefined && category !== null) {
+    } else if (category !== undefined && category !== null) {
       query = query?.eq('category', category);
     }
 
@@ -158,17 +164,22 @@ export class SupabaseService {
    * 取得購物車商品
    */
   getCartItems() {
-    return this.supabase?.from('cart').select(`id, product_id, quantity,
-      products (id, name, price, imageUrl, stock)`).eq('user_id', this.userId$.getValue());
+    const currentUserId = this.userId(); // 替代 .getValue()
+    if (!currentUserId) return null;
+
+    return this.supabase
+      ?.from('cart')
+      .select(`id, product_id, quantity, products (id, name, price, imageUrl, stock)`)
+      .eq('user_id', currentUserId);
   }
 
   /**
-   * 用BehaviorSubject 管理購物車資料
+   * 用Signal管理購物車資料
    */
   fetchCartItems() {
     this.getCartItems()?.then(({ data, error }) => {
       if (!error) {
-        this.cartItems$.next(data || []);
+        this.cartItems.set(data || []); // 替代 .next()
       }
     });
   }
@@ -178,12 +189,37 @@ export class SupabaseService {
    * @param productId
    * @param quantity
    */
-  addToCart(productId: number, quantity: number) {
-    return this.supabase?.from('cart').insert({
-      user_id: this.userId$.getValue(),
-      product_id: productId,
-      quantity: quantity,
-    });
+  async addToCart(productId: number, quantity: number) {
+    const currentUserId = this.userId();
+    // 1. 先檢查購物車裡是否已經有這件商品
+    const { data: existingItem, error: fetchError } = await this.supabase!
+      .from('cart')
+      .select('id, quantity')
+      .eq('user_id', currentUserId)
+      .eq('product_id', productId)
+      .maybeSingle(); // 使用 maybeSingle 避免找不到時報錯
+
+    if (fetchError) {
+      console.error('檢查購物車失敗:', fetchError);
+      return;
+    }
+
+    if (existingItem) {
+      // 2. 如果已存在，更新數量 (原本數量 + 新增數量)
+      const newQuantity = existingItem.quantity + quantity;
+      return this.supabase!.from('cart')
+        .update({ quantity: newQuantity })
+        .eq('id', existingItem.id);
+    }
+    else {
+      // 3. 如果不存在，直接新增
+      return this.supabase!.from('cart')
+        .insert({
+          user_id: currentUserId,
+          product_id: productId,
+          quantity: quantity,
+        });
+    }
   }
 
   /**
@@ -224,7 +260,7 @@ export class SupabaseService {
    */
   async updateProductStock(productId: number, quantity: number) {
     const response = await this.supabase?.from('products').select('stock').eq('id', productId).single();
-    if (response && response.data && response.data.stock) {
+    if (response?.data?.stock) {
       await this.supabase?.from('products').update({ stock: response.data.stock - quantity }).eq('id', productId);
     }
   }
@@ -235,11 +271,16 @@ export class SupabaseService {
   getOrders(page: number, limit: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    return this.supabase?.from('orders').select(`*,order_items(*)`, { count: 'exact' })
+    const currentUserId = this.userId(); // 替代 .getValue()
+
+    return this.supabase
+      ?.from('orders')
+      .select(`*,order_items(*)`, { count: 'exact' })
       .order('id', { ascending: true })
       .order('update', { ascending: false })
       .order('date', { ascending: false })
-      .range(from, to).eq('member_id', this.userId$.getValue());
+      .range(from, to)
+      .eq('member_id', currentUserId);
   }
   /**
    * 取得縣市列表

@@ -24,7 +24,6 @@
                     <span class="fw-bold me-2 mb-2 mb-md-0">數量：</span>
                     <nz-input-number
                       [(ngModel)]="item.quantity"
-                      [nzMin]="1"
                       [nzMax]="item.products.stock"
                       (ngModelChange)="updateCartItem(item.id, $event)"
                       nzVariant="underlined"

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -46,11 +46,9 @@ export class InspectionsComponent implements OnInit {
                 private modalService: NzModalService,
                 private sellerService: SellerService,
               ) {
-                this.sellerService.userId$.subscribe(userId => {
-                  this.userId = userId;
-                });
-                this.sellerService.email$.subscribe(email => {
-                  this.email = email;
+                effect(() => {
+                  this.userId = this.sellerService.userId();
+                  this.email = this.sellerService.email();
                 });
                }
 
