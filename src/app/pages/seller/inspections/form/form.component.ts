@@ -17,6 +17,7 @@ import { env } from '../../../../env/environment';
 // import { checkExpireDateValidator } from '../../../../validator/checkExpireDate';
 import { SellerService } from '../../../../service/seller.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { GoogleService } from '../../../../service/google.service';
 
 @Component({
   selector: 'inspections-form',
@@ -53,10 +54,6 @@ export class FormComponent implements OnInit {
 
   cardTypeImg: string | null = null;
 
-  accessToken: string | null = null;
-
-  isExpired: boolean = false;
-
   timeList: any[] = [
     { label: '09:00 - 10:00' },
     { label: '10:00 - 11:00' },
@@ -73,13 +70,9 @@ export class FormComponent implements OnInit {
     private modal: NzModalRef,
     private http: HttpClient,
     private sellerService: SellerService,
-    private modalService: NzModalService
-  ) {
-      effect(() => {
-        this.accessToken = this.sellerService.authToken();
-        this.isExpired = this.sellerService.isExpired();
-      });
-    }
+    private modalService: NzModalService,
+    private googleService: GoogleService
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -92,6 +85,9 @@ export class FormComponent implements OnInit {
     });
     this.generateWeekList();
     this.getCategory();
+    this.waitForGoogleScript().then(() => {
+      this.googleService.init(env.googleClientId);
+    });
   }
 
   /**
@@ -377,9 +373,10 @@ export class FormComponent implements OnInit {
   /**
    * 建立會議
    */
-  createEvent() {
+  async createEvent() {
     const selectedDate = this.form.value.date;
     const selectedTime = this.form.value.detailTime;
+    const accessToken = await this.googleService.getAccessToken();
 
     // 1. 安全檢查：確保有選取日期和時間，避免 split 報錯
     if (!selectedDate || !selectedTime) {
@@ -394,13 +391,13 @@ export class FormComponent implements OnInit {
     const endDateTime = new Date(startDateTime.getTime() + 30 * 60000); // 加 30 分鐘
 
     // 2. 第一層防護：發送前的前端判斷
-    if (this.accessToken === null || this.isExpired) {
+    if (!accessToken) {
       this.handleGoogleAuthError();
       return;
     }
 
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${this.accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     });
 
@@ -434,7 +431,8 @@ export class FormComponent implements OnInit {
         // 如果 API 回傳 401，代表 Token 在後端已經失效了
         if (error.status === 401) {
           this.handleGoogleAuthError();
-        } else {
+        }
+        else {
           this.message.error('建立行事曆事件失敗，請稍後再試');
         }
 
@@ -476,4 +474,21 @@ export class FormComponent implements OnInit {
   //   else if (/^35/.test(n)) this.cardTypeImg = '/img/JCB.png';
   //   else this.cardTypeImg = null;
   // }
+
+  waitForGoogleScript(): Promise<void> {
+    return new Promise((resolve) => {
+      if ((window as any).google?.accounts?.oauth2) {
+        resolve();
+        return;
+      }
+
+      const timer = setInterval(() => {
+        if ((window as any).google?.accounts?.oauth2) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 50);
+    });
+  }
+
 }

@@ -15,10 +15,6 @@ export class SellerService {
 
   email = signal<string | null>(null);
 
-  authToken = signal<string | null>(null);
-
-  isExpired = signal<boolean>(false);
-
   constructor() {
     this.createClient();
     this.loginState();
@@ -65,14 +61,10 @@ export class SellerService {
       if (session) {
         this.userId.set(session.user.id);
         this.email.set(session.user.email ?? null);
-        this.authToken.set(session.access_token);
-        this.isExpired.set(session.expires_at ? (Date.now() >= Number(session.expires_at * 1000)) : false);
       }
       else {
         this.userId.set(null);
         this.email.set(null);
-        this.authToken.set(null);
-        this.isExpired.set(false);
       }
     });
   }

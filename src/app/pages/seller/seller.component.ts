@@ -11,6 +11,8 @@ import { MatCardModule } from '@angular/material/card';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { LoginComponent } from '../seller/login/login.component';
 import { SellerService } from '../../service/seller.service';
+import { GoogleService } from '../../service/google.service';
+import { env } from '../../env/environment';
 
 @Component({
   selector: 'app-seller',
@@ -46,23 +48,23 @@ export class SellerComponent {
 
   email: string | null = null;
 
-  accessToken: string | null = null;
-
-  isExpired: boolean = false;
 
   constructor(
                 private router: Router,
                 private modalService: NzModalService,
-                public sellerService: SellerService
+                public sellerService: SellerService,
+                public googleService: GoogleService
               ) {
                 effect(() => {
                   this.userId = this.sellerService.userId();
                   this.email = this.sellerService.email();
-                  this.accessToken = this.sellerService.authToken();
-                  this.isExpired = this.sellerService.isExpired();
                 });
               }
+
   ngOnInit() {
+    this.waitForGoogleScript().then(() => {
+      this.googleService.init(env.googleClientId);
+    });
   }
 
   /**
@@ -103,6 +105,22 @@ export class SellerComponent {
       this.userId = null;
       this.email = null;
       window.location.href = '/seller/dashboard';
+    });
+  }
+
+  waitForGoogleScript(): Promise<void> {
+    return new Promise((resolve) => {
+      if ((window as any).google?.accounts?.oauth2) {
+        resolve();
+        return;
+      }
+
+      const timer = setInterval(() => {
+        if ((window as any).google?.accounts?.oauth2) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 50);
     });
   }
 
