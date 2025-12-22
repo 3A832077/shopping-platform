@@ -66,7 +66,7 @@ export class SellerService {
         this.userId.set(session.user.id);
         this.email.set(session.user.email ?? null);
         this.authToken.set(session.access_token);
-        this.isExpired.set(session.expires_at ? (Date.now() >= session.expires_at * 1000) : false);
+        this.isExpired.set(session.expires_at ? (Date.now() >= Number(session.expires_at * 1000)) : false);
       }
       else {
         this.userId.set(null);

@@ -1,25 +1,25 @@
-<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="true" style="padding: 10px;">
+<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
   <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
   </div>
   <div class="carousel-inner">
     <div class="carousel-item active">
-      <img src="/img/cd.jpg" class="d-block">
+      <img src="/img/cd.jpg" class="d-block w-100">
     </div>
     <div class="carousel-item">
-      <img src="/img/game.png" class="d-block">
+      <img src="/img/game.png" class="d-block w-100">
     </div>
     <div class="carousel-item">
-      <img src="/img/book.jpg" class="d-block">
+      <img src="/img/book.jpg" class="d-block w-100">
     </div>
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Previous</span>
   </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
     <span class="carousel-control-next-icon" aria-hidden="true"></span>
     <span class="visually-hidden">Next</span>
   </button>
@@ -31,7 +31,7 @@
       <div class="col-12 col-sm-6 col-md-3 mb-3 d-flex justify-content-center"
         routerLink="/category/{{ item.id }}" appRevealOnScroll [appRevealOnScrollDelay]="i * 100">
         <div class="category-container">
-          <img src="/img/{{ item.img }}" class="img-fluid categoryImg"/>
+          <img src="/img/{{ item.img }}" class="img-fluid categoryImg" loading="lazy"/>
           <div class="overlay">
             <div class="overlay-text">{{ item.name }}</div>
           </div>
@@ -43,10 +43,9 @@
 <div class="row pt-2">
   <h4>最新商品</h4>
     @for (item of productsList; track $index; let i = $index) {
-      <div class="col-12 col-sm-6 col-md-4 mb-3 d-flex justify-content-center"
-        routerLink="/product/{{ item.id }}" appRevealOnScroll [appRevealOnScrollDelay]="i * 100">
+      <div class="col-12 col-sm-6 col-md-4 mb-3 d-flex justify-content-center" appRevealOnScroll [appRevealOnScrollDelay]="i * 100">
         <div class="product-container">
-          <img src="{{ item.imageUrl }}" />
+          <img src="{{ item.imageUrl }}" loading="lazy" routerLink="/product/{{ item.id }}"/>
           <div class="product-info">
             <p>{{ item.name }}</p>
             <p>NT${{ item.price }}</p>
@@ -54,7 +53,26 @@
               <p class="text-danger">已售完</p>
             }
             @else {
-              <button matButton="elevated">購買</button>
+              <div class="cart-control-wrapper">
+                @if (!item.showQty) {
+                  <button mat-icon-button (click)="item.showQty = true" class="fade-in">
+                    <mat-icon matTooltip="加入購物車">add_shopping_cart</mat-icon>
+                  </button>
+                }
+                @else {
+                  <div class="quantity-stepper fade-in">
+                    <button mat-icon-button (click)="addToCart(item, -1)">
+                      <mat-icon class="icon">{{ item.tempQty <= 1 ? 'delete_outline' : 'remove' }}</mat-icon>
+                    </button>
+                    <span class="qty-number">{{ item.tempQty || 0 }}</span>
+                    <button mat-icon-button
+                            (click)="addToCart(item, 1)"
+                            [disabled]="item.tempQty >= item.stock">
+                      <mat-icon [style.color]="item.tempQty >= item.stock ? '#ccc' : ''" class="icon">add</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
             }
           </div>
         </div>

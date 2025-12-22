@@ -94,17 +94,19 @@ p{
   gap: 8px;
 }
 
-.sold-out {
-  color: #d32f2f;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-top: 10px;
-}
-
 .reward-badge {
   position: absolute;
   top: -1px;
   right: -4px;
   width: 40px;
   height: auto;
+}
+
+.list {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

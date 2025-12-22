@@ -58,6 +58,8 @@ export class MainComponent implements OnInit {
                   this.userId = this.supabaseService.userId();
                   this.email = this.supabaseService.email();
                   this.cartCount = this.supabaseService.cartCount();
+                  this.sellerId = this.sellerService.userId();
+                  this.sellerEmail = this.sellerService.email();
                 });
               }
 

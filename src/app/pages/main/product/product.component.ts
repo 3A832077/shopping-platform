@@ -13,6 +13,7 @@ import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
 import { RouterLink } from '@angular/router';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { NzCarouselModule } from 'ng-zorro-antd/carousel';
 
 @Component({
   selector: 'app-product',
@@ -29,7 +30,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     NzInputNumberModule,
     RouterLink,
     NzPaginationModule,
-    MatTooltipModule
+    MatTooltipModule,
+    NzCarouselModule
 ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
@@ -67,6 +69,8 @@ export class ProductComponent implements OnInit {
   selectCategory: any;
 
   total: number = 0;
+
+  loading: boolean = false;
 
   constructor(
                 private supabaseService: SupabaseService
@@ -114,6 +118,7 @@ export class ProductComponent implements OnInit {
    * @param pageSize
    */
   getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean) {
+    this.loading = true;
     sort = this.selectSort === true ? true : false;
     this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice, excellent)?.then(({ data, count, error }) => {
       if (error) {
@@ -122,6 +127,7 @@ export class ProductComponent implements OnInit {
       }
       this.productsList = data || [];
       this.total = count || 0;
+      this.loading = false;
     });
   }
 

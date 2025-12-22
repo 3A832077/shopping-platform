@@ -69,7 +69,7 @@
                   @for (product of order.order_items; track product) {
                     <tr>
                       <td>
-                        <img [src]="product.img" alt="商品圖片" width="50" height="50" />
+                        <img [src]="product.img" alt="商品圖片" width="50" height="50" loading="lazy"/>
                       </td>
                       <td>{{ product.productName }}</td>
                       <td>{{ product.quantity }}</td>

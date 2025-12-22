@@ -73,7 +73,7 @@
                   @for (product of order.order_items; track product) {
                     <tr>
                       <td>
-                        <img [src]="product.img" style="width: 50px; height: 50px;">
+                        <img [src]="product.img" class="pointer" width="50px" height="50px" routerLink="/product/{{product.products_id}}" loading="lazy">
                       </td>
                       <td>{{ product.productName }}</td>
                       <td>{{ product.quantity }}</td>

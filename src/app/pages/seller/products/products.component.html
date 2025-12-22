@@ -37,7 +37,7 @@
       @for (data of filterTable.data; track data) {
         <tr>
           <td nzAlign="center">
-            <img src="{{data.imageUrl}}"/>
+            <img src="{{data.imageUrl}}" loading="lazy"/>
           </td>
           <td nzAlign="center">{{ data.name }}</td>
           <td nzAlign="center">{{ data.categoryName }}</td>

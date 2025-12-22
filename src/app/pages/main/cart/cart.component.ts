@@ -44,31 +44,16 @@ export class CartComponent implements OnInit {
     effect(() => {
       this.userId = this.supabaseService.userId();
       this.cartItems = this.supabaseService.cartItems() || [];
+      this.sum = this.supabaseService.totalSum();
+      this.cartItems.forEach(item => {
+        if (item.products.stock < item.quantity) {
+          this.messageService.warning(`${item.products.name} 庫存不足`);
+        }
+      });
     });
   }
 
   ngOnInit(): void {
-    this.cartItems.forEach((items) => {
-      if (!this.userId) {
-        this.messageService.info('請先登入');
-        return;
-      }
-      this.cartItems = items || [];
-      this.sum = this.cartItems.reduce(
-        (acc, item) => acc + item.products.price * item.quantity,
-        0
-      );
-      this.cartItems.forEach((item) => {
-        if (item.quantity === 0) {
-          this.removeCartItem(item.id);
-        }
-        if (item.products.stock < item.quantity) {
-          this.messageService.warning(
-            `${item.products.name} 庫存不足，請調整數量`
-          );
-        }
-      });
-    });
     this.supabaseService.fetchCartItems();
   }
 
@@ -79,7 +64,8 @@ export class CartComponent implements OnInit {
     this.supabaseService.removeCartItem(itemId)?.then(({ error }) => {
       if (error) {
         console.error(error);
-      } else {
+      }
+      else {
         this.messageService.success('商品已移除');
         this.supabaseService.fetchCartItems();
       }

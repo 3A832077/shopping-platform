@@ -34,9 +34,9 @@
           @if (priceIsExpanded){
             <div class="filter-content">
               <div class="d-flex align-items-center">
-                <nz-input-number class="me-2" [(ngModel)]="minPrice" [nzMin]="0"></nz-input-number>
+                <nz-input-number class="me-2" [(ngModel)]="minPrice" [nzMin]="0" nzVariant="underlined"></nz-input-number>
                 <span class="mx-1">-</span>
-                <nz-input-number class="ms-2" [(ngModel)]="maxPrice" [nzMin]="0"
+                <nz-input-number class="ms-2" [(ngModel)]="maxPrice" [nzMin]="0" nzVariant="underlined"
                   (ngModelChange)="getProducts(pageIndex, pageSize, selectSort, id, minPrice, maxPrice)">
                 </nz-input-number>
               </div>

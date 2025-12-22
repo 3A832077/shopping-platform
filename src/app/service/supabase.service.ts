@@ -22,6 +22,12 @@ export class SupabaseService {
     this.cartItems().reduce((acc, item) => acc + item.quantity, 0)
   );
 
+  // 總金額自動計算
+  totalSum = computed(() => {
+    return this.cartItems().reduce(
+      (acc, item) => acc + (item.products?.price ?? 0) * item.quantity, 0);
+  });
+
   constructor() {
     this.createClient();
     this.loginState();

@@ -12,11 +12,11 @@
           <div class="bg-white p-3">
             <div class="d-flex flex-column flex-md-row">
               <div class="me-md-3 mb-3 mb-md-0 text-center">
-                <img [src]="item.products.imageUrl" class="rounded" width="150" height="150" />
+                <img [src]="item.products.imageUrl" class="pointer" width="150" height="150" routerLink="/product/{{item.products.id}}" loading="lazy"/>
               </div>
               <div class="flex-grow-1">
 
-                <div class="fw-bold fs-5 mb-1" routerLink="/product/{{item.products.id}}" style="cursor: pointer;">
+                <div class="fw-bold fs-5 mb-1" routerLink="/product/{{item.products.id}}" class="pointer">
                   {{ item.products.name }}
                 </div>
                 <div class="mt-4 d-flex flex-column flex-md-row flex-wrap align-items-md-center justify-content-between gap-3">
@@ -72,7 +72,7 @@
         <h4 class="fw-bold">購物車是空的</h4>
       </div>
       @if (!userId) {
-        <button matButton routerLink="/login">登入</button>
+        <button matButton routerLink="/login">請先登入</button>
       }
       @else {
         <button matButton routerLink="/home">返回首頁</button>

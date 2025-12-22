@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect, OnInit } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -13,6 +13,7 @@ import { SupabaseService } from '../../../service/supabase.service';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-orders',
@@ -29,7 +30,8 @@ import { NzMessageService } from 'ng-zorro-antd/message';
     NzRateModule,
     NzSelectModule,
     MatTooltipModule,
-    CommonModule
+    CommonModule,
+    RouterLink
   ],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
@@ -75,10 +77,19 @@ export class OrdersComponent implements OnInit {
   constructor(
                 private supabaseService: SupabaseService,
                 private messageService: NzMessageService
-              ) { }
+              ) {
+                effect(() => {
+                  if (this.supabaseService.userId()) {
+                    this.getOrders();
+                  }
+                  else{
+                    this.messageService.warning('請先登入');
+                  }
+                });
+              }
 
   ngOnInit(): void {
-    this.getOrders();
+
   }
 
   /**

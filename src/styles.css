@@ -33,3 +33,14 @@ body {
 .pb-10{
   padding-bottom: 10px;
 }
+
+.sold-out {
+  color: #d32f2f;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.pointer{
+  cursor: pointer;
+}
