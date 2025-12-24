@@ -48,6 +48,7 @@ export class SellerComponent {
 
   email: string | null = null;
 
+  token: string | null = null;
 
   constructor(
                 private router: Router,
@@ -62,9 +63,7 @@ export class SellerComponent {
               }
 
   ngOnInit() {
-    this.waitForGoogleScript().then(() => {
-      this.googleService.init(env.googleClientId);
-    });
+    this.getToken();
   }
 
   /**
@@ -108,20 +107,8 @@ export class SellerComponent {
     });
   }
 
-  waitForGoogleScript(): Promise<void> {
-    return new Promise((resolve) => {
-      if ((window as any).google?.accounts?.oauth2) {
-        resolve();
-        return;
-      }
-
-      const timer = setInterval(() => {
-        if ((window as any).google?.accounts?.oauth2) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 50);
-    });
+  async getToken(): Promise<void> {
+    this.token = await this.sellerService.getAccessToken();
   }
 
 

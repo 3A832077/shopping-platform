@@ -2,13 +2,11 @@ import { Injectable, signal } from '@angular/core';
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../env/environment';
 import { Database } from '../types/supabase';
-import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SellerService {
-
   private supabase?: SupabaseClient;
 
   userId = signal<string | null>(null);
@@ -24,7 +22,8 @@ export class SellerService {
    * 建立 Supabase 客戶端
    */
   createClient() {
-    if (typeof window === 'undefined' || createClient<Database> === undefined) return;
+    if (typeof window === 'undefined' || createClient<Database> === undefined)
+      return;
     this.supabase = createClient<Database>(env.supabaseUrl, env.supabaseKey);
   }
 
@@ -58,15 +57,23 @@ export class SellerService {
    */
   loginState() {
     return this.supabase?.auth.onAuthStateChange((_, session: Session | null) => {
-      if (session) {
-        this.userId.set(session.user.id);
-        this.email.set(session.user.email ?? null);
+        if (session) {
+          this.userId.set(session.user.id);
+          this.email.set(session.user.email ?? null);
+        } else {
+          this.userId.set(null);
+          this.email.set(null);
+        }
       }
-      else {
-        this.userId.set(null);
-        this.email.set(null);
-      }
-    });
+    );
+  }
+
+  async getAccessToken(): Promise<string | null> {
+    const result = await this.supabase?.auth.getSession();
+    if (!result || !result.data) {
+      return null;
+    }
+    return result.data.session?.provider_token || null;
   }
 
   /**
@@ -77,7 +84,12 @@ export class SellerService {
       provider: 'google',
       options: {
         redirectTo: window.location.origin,
-        scopes: 'https://www.googleapis.com/auth/calendar.events openid email profile'
+        scopes:
+          'https://www.googleapis.com/auth/calendar.events openid email profile',
+        queryParams: {
+          access_type: 'offline', // 確保能拿到存取權
+          prompt: 'consent', // 強制跳出授權畫面，讓使用者重新選帳號並同意 Scopes
+        },
       },
     });
   }
@@ -97,7 +109,14 @@ export class SellerService {
    * @param page
    * @param limit
    */
-  getProducts(page: number, limit: number, searchTerm: any, sortField: string = 'update', sortOrder: boolean = false, category: any = null) {
+  getProducts(
+    page: number,
+    limit: number,
+    searchTerm: any,
+    sortField: string = 'update',
+    sortOrder: boolean = false,
+    category: any = null
+  ) {
     let query = this.supabase?.from('products').select('*', { count: 'exact' });
 
     const from = (page - 1) * limit;
@@ -105,12 +124,12 @@ export class SellerService {
 
     if (Array.isArray(category) && category.length > 0) {
       query = query?.in('category', category);
-    }
-    else if (category !== undefined && category !== null) {
+    } else if (category !== undefined && category !== null) {
       query = query?.eq('category', category);
     }
 
-    return query?.order(sortField, { ascending: sortOrder })
+    return query
+      ?.order(sortField, { ascending: sortOrder })
       .ilike('name', `%${searchTerm}%`)
       .order('id')
       .range(from, to);
@@ -151,7 +170,7 @@ export class SellerService {
   /**
    * 取得所有產品
    */
-  getAllProducts(){
+  getAllProducts() {
     return this.supabase?.from('products').select('*');
   }
 
@@ -165,15 +184,21 @@ export class SellerService {
       return;
     }
     const ext = file.name.split('.').pop(); // 副檔名
-    const safeName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
-    const { data, error } = await this.supabase.storage.from('image').upload(`public/img/${safeName}`, file);
+    const safeName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${ext}`;
+    const { data, error } = await this.supabase.storage
+      .from('image')
+      .upload(`public/img/${safeName}`, file);
     if (error) {
       console.error('上傳失敗', error);
       return;
     }
 
     // 建立可公開存取的網址
-    const imageUrl = this.supabase?.storage.from('image').getPublicUrl(data.path).data.publicUrl;
+    const imageUrl = this.supabase?.storage
+      .from('image')
+      .getPublicUrl(data.path).data.publicUrl;
 
     console.log('圖片網址：', imageUrl);
     return imageUrl;
@@ -186,11 +211,19 @@ export class SellerService {
    * @param col
    * @param order
    */
-  getOrders(page: number, limit: number, col: string = 'update', order: boolean = false) {
+  getOrders(
+    page: number,
+    limit: number,
+    col: string = 'update',
+    order: boolean = false
+  ) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    return this.supabase?.from('orders').select(`*,order_items(*)`, { count: 'exact' }).
-    order(col, { ascending: order }).range(from, to);
+    return this.supabase
+      ?.from('orders')
+      .select(`*,order_items(*)`, { count: 'exact' })
+      .order(col, { ascending: order })
+      .range(from, to);
   }
 
   /**
@@ -210,7 +243,12 @@ export class SellerService {
   getInspections(page: number, limit: number) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
-    return this.supabase?.from('inspections').select('*', { count: 'exact' }).order('update', { ascending: false }).order('id').range(from, to);
+    return this.supabase
+      ?.from('inspections')
+      .select('*', { count: 'exact' })
+      .order('update', { ascending: false })
+      .order('id')
+      .range(from, to);
   }
 
   /**
@@ -224,8 +262,10 @@ export class SellerService {
   /**
    * 取得各類別銷售量
    */
-  getCategorySales(){
-    return this.supabase?.from('order_items').select(`quantity, products_id, products (category, categories (name))`);
+  getCategorySales() {
+    return this.supabase
+      ?.from('order_items')
+      .select(`quantity, products_id, products (category, categories (name))`);
   }
 
   /**

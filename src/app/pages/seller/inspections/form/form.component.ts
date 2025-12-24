@@ -1,7 +1,7 @@
-import { Component, effect, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { formatDate } from '@angular/common';
-import { FormsModule,ReactiveFormsModule,FormGroup,FormBuilder,Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -13,8 +13,6 @@ import { catchError, EMPTY, tap } from 'rxjs';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { env } from '../../../../env/environment';
-// import { checkCardNumberValidator } from '../../../../validator/checkCradNumber';
-// import { checkExpireDateValidator } from '../../../../validator/checkExpireDate';
 import { SellerService } from '../../../../service/seller.service';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { GoogleService } from '../../../../service/google.service';
@@ -67,7 +65,7 @@ export class FormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private message: NzMessageService,
-    private modal: NzModalRef,
+    public modal: NzModalRef,
     private http: HttpClient,
     private sellerService: SellerService,
     private modalService: NzModalService,
@@ -76,12 +74,11 @@ export class FormComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      name: [null],
-      product: [null],
-      category: [null],
-      date: [null],
-      time: [null],
-      detailTime: [null],
+      product: [null, Validators.required],
+      category: [null, Validators.required],
+      date: [null, Validators.required],
+      time: [null, Validators.required],
+      detailTime: [null, Validators.required],
     });
     this.generateWeekList();
     this.getCategory();
@@ -91,92 +88,61 @@ export class FormComponent implements OnInit {
   }
 
   /**
+   * 監聽日期選擇的變化
+   * @param event
+   */
+  dateChange(event: any): void {
+    this.form.patchValue({ time: null, detailTime: null });
+    this.detailTimeList = [];
+  }
+
+  /**
    * 監聽時間選擇的變化
    * @param event
    */
   timeChange(event: any): void {
-    if (event) {
-      const [start, end] = event.split(' - ');
-      const selectedDate = this.form.value.date;
+    this.form.get('detailTime')?.setValue(null);
+    this.detailTimeList = [];
+    if (!event) return;
 
-      if (selectedDate) {
-        const now = new Date();
-        // 1. 關鍵：把選取的日期和現在的日期都歸零到 00:00:00，只比日期
-        const selectedDay = new Date(selectedDate);
-        selectedDay.setHours(0, 0, 0, 0);
+    const selectedDate = this.form.value.date;
+    if (!selectedDate) return;
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+    const [start, end] = event.split(' - ');
+    const endDT = this.getDateTime(selectedDate, end);
 
-        // 2. 如果選的是今天，才需要判斷時分秒
-        if (selectedDay.getTime() === today.getTime()) {
-          const startDateTime = new Date(selectedDate);
-          const [startHour, startMin] = start.split(':').map(Number);
-          startDateTime.setHours(startHour, startMin, 0, 0);
-
-          const endDateTime = new Date(selectedDate);
-          const [endHour, endMin] = end.split(':').map(Number);
-          endDateTime.setHours(endHour, endMin, 0, 0);
-
-          // 如果連結束時間都比現在早，才報錯
-          if (endDateTime < now) {
-            this.message.warning('該時段已超過目前時間，請重新選擇');
-            this.form.get('time')?.setValue(null); // 把選錯的大時段清掉
-            this.detailTimeList = [];
-            this.form.get('detailTime')?.setValue(null);
-            return;
-          }
-        }
-        // 3. 如果選的是未來日期 (selectedDay > today)，直接跳過判斷，執行 generateDetailTime
-        else if (selectedDay < today) {
-          // 如果是過去的日期 (DatePicker沒擋住的情況)
-          this.message.warning('不可選擇過去的日期');
-          this.form.get('time')?.setValue(null);
-          return;
-        }
-      }
-
-      // 合法時段或是未來日期，執行生成邏輯
-      this.form.get('detailTime')?.setValue(null);
-      this.generateDetailTime(start, end);
+    // 如果現在時間已經讓這個時段沒有可選的小節點了
+    if (this.isTooLate(endDT)) {
+      this.message.warning('該時段已無剩餘預約點，請選擇下一時段');
+      this.form.get('time')?.setValue(null);
+      return;
     }
-    else {
-      this.detailTimeList = [];
-      this.form.get('detailTime')?.setValue(null);
-    }
+
+    this.generateDetailTime(this.getDateTime(selectedDate, start), endDT);
   }
 
-  // 取得「目前選中日期」下可用的時段
+  /**
+   * 取得「目前選中日期」下可用的時段
+   * @returns
+   */
   get filteredTimeList(): any[] {
     const selectedDate = this.form.get('date')?.value;
     if (!selectedDate) return [];
 
-    const now = new Date();
-    const todayStr = now.toDateString();
-    const selectedDateObj = new Date(selectedDate);
-    const isToday = selectedDateObj.toDateString() === todayStr;
+    const selectedTS = this.getDayTimestamp(selectedDate);
+    const todayTS = this.getDayTimestamp(new Date());
 
-    // 如果選的是未來日期，直接回傳原始清單
-    if (selectedDateObj.setHours(0,0,0,0) > now.setHours(0,0,0,0)) {
-      return this.timeList;
-    }
+    if (selectedTS > todayTS) return this.timeList;
 
-    // 如果是今天，過濾掉已經結束的時段
-    if (isToday) {
+    if (selectedTS === todayTS) {
       return this.timeList.filter(item => {
-        // 取得結束時間，例如 "09:00 - 10:00" 取出 "10:00"
-        const endTimeStr = item.label.split(' - ')[1];
-        const [endHour, endMin] = endTimeStr.split(':').map(Number);
+        const endStr = item.label.split(' - ')[1];
+        const endDT = this.getDateTime(selectedDate, endStr);
 
-        const endDateTime = new Date(selectedDateObj);
-        endDateTime.setHours(endHour, endMin, 0, 0);
-
-        // 只要結束時間比現在晚，就顯示出來
-        return endDateTime > now;
+        // 改用 isTooLate：如果現在是 14:46，距離 15:00 不到 15 分鐘，回傳 true (過濾掉)
+        return !this.isTooLate(endDT);
       });
     }
-
-    // 如果是過去的日期（DatePicker 沒擋住的情況），回傳空陣列
     return [];
   }
 
@@ -185,16 +151,8 @@ export class FormComponent implements OnInit {
    * @param event
    */
   categoryChange(event: any): void {
-    if (event) {
-      this.form.get('product')?.setValue(null);
-      this.selectedProducts = this.productList
-        .filter((e: any) => e.category === event)
-        .flatMap((e: any) => e.products);
-    }
-    else {
-      this.selectedProducts = [];
-      this.form.get('product')?.setValue(null);
-    }
+    this.form.get('product')?.setValue(null);
+    this.selectedProducts = event ? this.productList.find(p => p.category === event)?.products || [] : [];
   }
 
   /**
@@ -234,41 +192,17 @@ export class FormComponent implements OnInit {
   }
 
   /**
-   * 關閉modal
-   */
-  close() {
-    this.modal.destroy();
-  }
-
-  /**
    * 生成星期列表
    */
   generateWeekList(): void {
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
     const today = new Date();
-
     for (let i = 0; i < 7; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() + i);
-
-      const mmdd = `${date.getFullYear()}-${this.pad(
-        date.getMonth() + 1
-      )}-${this.pad(date.getDate())}`;
-      const weekday = weekdays[date.getDay()];
-
-      this.weekList.push({
-        value: mmdd,
-        label: `${mmdd} (${weekday})`,
-      });
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const mmdd = formatDate(d, 'yyyy-MM-dd', 'en-US');
+      this.weekList.push({ value: mmdd, label: `${mmdd} (${weekdays[d.getDay()]})` });
     }
-  }
-
-  /**
-   * 補零
-   * @param n
-   */
-  pad(n: number): string {
-    return n < 10 ? '0' + n : n.toString();
   }
 
   /**
@@ -276,63 +210,18 @@ export class FormComponent implements OnInit {
    * @param start
    * @param end
    */
-  private generateDetailTime(start: string, end: string): void {
-    const selectedDate = this.form.value.date;
-    if (!selectedDate) return;
+  private generateDetailTime(startTime: Date, endTime: Date): void {
+    const times = [];
+    let current = new Date(startTime);
 
-    // 1. 建立當天的開始與結束時間物件，確保日期與選取的日期一致
-    const startTime = this.getDateTime(selectedDate, start);
-    const endTime = this.getDateTime(selectedDate, end);
-
-    const now = new Date();
-    const times: { label: string; value: string }[] = [];
-
-    // 2. 判斷是否為今天
-    const isToday = new Date(selectedDate).toDateString() === now.toDateString();
-
-    let currentTime = new Date(startTime.getTime());
-
-    while (currentTime < endTime) {
-      // 3. 邏輯：如果不是今天，直接放進去；如果是今天，才需要比現在時間晚
-      if (!isToday || currentTime > now) {
-        times.push({
-          label: this.formatTime(currentTime),
-          value: this.formatTime(currentTime),
-        });
+    while (current < endTime) {
+      if (!this.isPast(current)) {
+        const timeStr = this.formatTime(current);
+        times.push({ label: timeStr, value: timeStr });
       }
-      currentTime = new Date(currentTime.getTime() + 15 * 60000); // 加 15 分鐘
+      current = new Date(current.getTime() + 15 * 60000);
     }
-
     this.detailTimeList = times;
-  }
-
-  /**
-   * 輔助方法：結合日期與時間字串 (HH:mm) 產生完整的 Date 物件
-   */
-  private getDateTime(date: Date, timeStr: string): Date {
-    const res = new Date(date);
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    res.setHours(hours, minutes, 0, 0);
-    return res;
-  }
-
-  /**
-   * 將時間字串解析為 Date 物件
-   */
-  private parseTime(time: string): Date {
-    const [hours, minutes] = time.split(':').map(Number);
-    const date = new Date();
-    date.setHours(hours, minutes, 0, 0);
-    return date;
-  }
-
-  /**
-   * 將 Date 格式化為 HH:mm
-   */
-  private formatTime(date: Date): string {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
   }
 
   /**
@@ -374,75 +263,43 @@ export class FormComponent implements OnInit {
    * 建立會議
    */
   async createEvent() {
-    const selectedDate = this.form.value.date;
-    const selectedTime = this.form.value.detailTime;
-    const accessToken = await this.googleService.getAccessToken();
+    const { date, detailTime } = this.form.value;
+    const accessToken = await this.sellerService.getAccessToken();
 
-    // 1. 安全檢查：確保有選取日期和時間，避免 split 報錯
-    if (!selectedDate || !selectedTime) {
-      this.message.warning('請選擇完整的預約日期與時間');
-      return;
-    }
+    if (!date || !detailTime) return this.message.warning('請選擇完整的預約日期與時間');
+    if (!accessToken) return this.handleGoogleAuthError();
 
-    const [hours, minutes] = selectedTime.split(':').map(Number);
-    const startDateTime = new Date(selectedDate);
-    startDateTime.setHours(hours, minutes, 0, 0);
-
-    const endDateTime = new Date(startDateTime.getTime() + 30 * 60000); // 加 30 分鐘
-
-    // 2. 第一層防護：發送前的前端判斷
-    if (!accessToken) {
-      this.handleGoogleAuthError();
-      return;
-    }
+    const startDT = this.getDateTime(date, detailTime);
+    const endDT = new Date(startDT.getTime() + 30 * 60000);
 
     const headers = new HttpHeaders({
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
     });
 
-    const event = {
-      summary: 'test',
-      description: '123',
-      start: {
-        dateTime: startDateTime.toISOString(),
-        timeZone: 'Asia/Taipei',
-      },
-      end: {
-        dateTime: endDateTime.toISOString(),
-        timeZone: 'Asia/Taipei',
-      },
+    const eventBody = {
+      summary: '檢測會議',
+      description: '',
+      start: { dateTime: startDT.toISOString(), timeZone: 'Asia/Taipei' },
+      end: { dateTime: endDT.toISOString(), timeZone: 'Asia/Taipei' },
       conferenceData: {
         createRequest: {
-          requestId: 'meet-' + Date.now().toString(), // 建議用時間戳比隨機數穩定
+          requestId: `meet-${Date.now()}`
         },
       },
     };
 
-    // 3. 發送請求並處理第二層防護 (API 回傳 401)
-    this.http.post(`${env.googleApiUrl}`, event, { headers }).pipe(
-      tap((response: any) => {
-        this.meetUrl = response.hangoutLink;
-        console.log('會議連結:', this.meetUrl);
+    this.http.post(`${env.googleApiUrl}`, eventBody, { headers }).pipe(
+      tap((res: any) => {
+        this.meetUrl = res.hangoutLink;
+        this.submit();
       }),
-      catchError((error: HttpErrorResponse) => {
-        console.error('Google API Error:', error);
-
-        // 如果 API 回傳 401，代表 Token 在後端已經失效了
-        if (error.status === 401) {
-          this.handleGoogleAuthError();
-        }
-        else {
-          this.message.error('建立行事曆事件失敗，請稍後再試');
-        }
-
-        // 返回 EMPTY 讓 subscribe 不會執行
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 401) this.handleGoogleAuthError();
+        else this.message.error('建立會議失敗');
         return EMPTY;
       })
-    ).subscribe(() => {
-      // 只有成功拿回連結後才執行最後的 submit
-      this.submit();
-    });
+    ).subscribe();
   }
 
   /**
@@ -459,36 +316,77 @@ export class FormComponent implements OnInit {
   }
 
   /**
-   * 判斷信用卡號類別
-   * @param event
+   * 等待 Google Script載入完成
+   * @returns
    */
-  // checkCardType(event: any): void {
-  //   if (!event) {
-  //     this.cardTypeImg = null;
-  //     return;
-  //   }
-  //   const n = event.replace(/\D/g, '');
-  //   if (/^4/.test(n)) this.cardTypeImg = '/img/visa.png';
-  //   else if (/^5[1-5]/.test(n)) this.cardTypeImg = '/img/mastercard.png';
-  //   else if (/^3[47]/.test(n)) this.cardTypeImg = '/img/amex.png';
-  //   else if (/^35/.test(n)) this.cardTypeImg = '/img/JCB.png';
-  //   else this.cardTypeImg = null;
-  // }
-
   waitForGoogleScript(): Promise<void> {
     return new Promise((resolve) => {
-      if ((window as any).google?.accounts?.oauth2) {
-        resolve();
-        return;
-      }
-
-      const timer = setInterval(() => {
+      if (typeof window !== 'undefined') {
         if ((window as any).google?.accounts?.oauth2) {
-          clearInterval(timer);
           resolve();
+          return;
         }
-      }, 50);
+
+        const timer = setInterval(() => {
+          if ((window as any).google?.accounts?.oauth2) {
+            clearInterval(timer);
+            resolve();
+          }
+        }, 50);
+      }
     });
   }
+
+  /**
+   * 檢查日期是否為過去
+   * @param date
+   * @returns
+   */
+  private isPast(date: Date): boolean {
+    return date.getTime() < Date.now();
+  }
+
+  /**
+   * 取得日期的時間
+   * @param date
+   * @returns
+   */
+  private getDayTimestamp(date: any): number {
+    return new Date(date).setHours(0, 0, 0, 0);
+  }
+
+  /**
+   * 取得日期與時間的 Date物件
+   * @param date
+   * @param timeStr
+   * @returns
+   */
+  private getDateTime(date: any, timeStr: string): Date {
+    const res = new Date(date);
+    const [h, m] = timeStr.split(':').map(Number);
+    res.setHours(h, m, 0, 0);
+    return res;
+  }
+
+  /**
+   * 格式化時間字串
+   * @param date
+   * @returns
+   */
+  private formatTime(date: Date): string {
+    return formatDate(date, 'HH:mm', 'en-US');
+  }
+
+  /**
+   * 檢查該時段是否已無可用的小時段
+   * @param endTime 該大時段的結束時間 (例如 15:00)
+   */
+  private isTooLate(endTime: Date): boolean {
+    const now = new Date();
+    // 緩衝時間：最後一個時段是 45 分，所以如果現在距離整點不到 15 分鐘，就代表沒時段了
+    const bufferTime = 15 * 60000;
+    return (endTime.getTime() - now.getTime()) <= bufferTime;
+  }
+
 
 }
