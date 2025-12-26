@@ -10,6 +10,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { FormComponent } from './form/form.component';
 import { SellerService } from '../../../service/seller.service';
+import { CanOpenPipe } from '../../../pipe/can-open.pipe';
+import { map, shareReplay, timer } from 'rxjs';
 
 @Component({
   selector: 'app-inspections',
@@ -17,7 +19,7 @@ import { SellerService } from '../../../service/seller.service';
               CommonModule, NzTableModule, NzButtonModule,
               NzModalModule, NzDividerModule, NzFormModule,
               NzInputModule, FormsModule, ReactiveFormsModule,
-              NzIconModule
+              NzIconModule, CanOpenPipe
            ],
   templateUrl: './inspections.component.html',
   styleUrl: './inspections.component.css'
@@ -41,6 +43,11 @@ export class InspectionsComponent implements OnInit {
   email: string | null = null;
 
   hasWarned = false;
+
+  now$ = timer(0, 30000).pipe(
+    map(() => new Date()),
+    shareReplay(1)
+  );
 
   constructor(
                 private modalService: NzModalService,
@@ -93,18 +100,6 @@ export class InspectionsComponent implements OnInit {
         this.getInspections();
       }
     });
-  }
-
-  /**
-   * 檢查是否可以開啟連結
-   * @param date
-   */
-  canOpenLink(date: string): boolean {
-    if (!date) return false;
-    const now = new Date();
-    const target = new Date(date);
-    const diff = (target.getTime() - now.getTime()) / (1000 * 60); // 分鐘
-    return diff <= 30 && diff >= -15;
   }
 
   /**

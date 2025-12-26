@@ -7,13 +7,15 @@ import { SupabaseService } from '../../../service/supabase.service';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzInputNumberModule  } from 'ng-zorro-antd/input-number';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { RouterLink } from '@angular/router';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { NzCarouselModule } from 'ng-zorro-antd/carousel';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzFormModule } from 'ng-zorro-antd/form';
 
 @Component({
   selector: 'app-product',
@@ -31,7 +33,10 @@ import { NzCarouselModule } from 'ng-zorro-antd/carousel';
     RouterLink,
     NzPaginationModule,
     MatTooltipModule,
-    NzCarouselModule
+    NzCarouselModule,
+    NzInputModule,
+    ReactiveFormsModule,
+    NzFormModule
 ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.css'
@@ -71,6 +76,8 @@ export class ProductComponent implements OnInit {
   total: number = 0;
 
   loading: boolean = false;
+
+  searchTerm: string = '';
 
   constructor(
                 private supabaseService: SupabaseService
@@ -117,10 +124,10 @@ export class ProductComponent implements OnInit {
    * @param pageIndex
    * @param pageSize
    */
-  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean) {
+  getProducts(pageIndex: number = 1, pageSize: number = 12, sort: boolean = true, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean, searchTerm?: string) {
     this.loading = true;
     sort = this.selectSort === true ? true : false;
-    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice, excellent)?.then(({ data, count, error }) => {
+    this.supabaseService?.getProducts(pageIndex, pageSize, sort, category, minPrice, maxPrice, excellent, searchTerm)?.then(({ data, count, error }) => {
       if (error) {
         console.error(error);
         return;

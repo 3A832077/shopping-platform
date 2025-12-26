@@ -118,7 +118,7 @@ export class SupabaseService {
    * @param page
    * @param limit
    */
-  getProducts(page: number = 1, limit: number = 12, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean) {
+  getProducts(page: number = 1, limit: number = 12, sort: boolean = false, category?: any, minPrice?: number, maxPrice?: number, excellent?: boolean, searchTerm?: string) {
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     let query = this.supabase?.from('products').select('*', { count: 'exact' }).eq('status', true);
@@ -134,6 +134,9 @@ export class SupabaseService {
     }
     if (maxPrice !== undefined && maxPrice !== null && maxPrice > 0) {
       query = query?.lte('price', maxPrice);
+    }
+    if (searchTerm) {
+      query = query?.ilike('name', `%${searchTerm}%`);
     }
 
     if (excellent) {

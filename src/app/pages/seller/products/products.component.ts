@@ -154,7 +154,7 @@ export class ProductsComponent implements OnInit {
    */
   filterSort(sort: any, column: string, category: any) {
     const sortField = column;
-    const sortOrder = sort === 'ascend' || sort ? true : false;
+    const sortOrder = sort === 'ascend';
     if (!category || category?.length === 0) {
       category = null;
     }

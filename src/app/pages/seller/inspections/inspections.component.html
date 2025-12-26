@@ -61,9 +61,13 @@
         <td>{{ (item.date + 'T' + item.detailTime) | date:'yyyy-MM-dd HH:mm' }}</td>
         <td>
           @if (item.url) {
-            <button nz-button nzType="link" (click)="openLink(item.url)"
-              [disabled]="!canOpenLink((item.date + 'T' + item.detailTime))" >
-              {{ item.url }}
+            @let status = (now$ | async) | meetingStatus: item.date + 'T' + item.detailTime;
+            <button nz-button nzType="link" [disabled]="status !== 1" (click)="openLink(item.url)">
+              @switch (status) {
+                @case (1) { 前往檢測 }
+                @case (2) { 已過期 }
+                @default { 未開放 }
+              }
             </button>
           }
         </td>
